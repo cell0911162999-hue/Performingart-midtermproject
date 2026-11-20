@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>期中展演・兩分鐘走位動畫</title>
+<title>期中展演・兩分鐘走位動畫（含雙人舞）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -62,7 +62,7 @@
 <div class="wrap">
   <header>
     <h1>期中展演・兩分鐘走位動畫</h1>
-    <p>正面看舞台（觀眾視角）。人越往後越小；身體越矮代表 level 越低。</p>
+    <p>正面看舞台（觀眾視角）。人越往後越小；身體越矮代表 level 越低；頭上出現黑色「定」字＝定像（停住不動）。</p>
   </header>
 
   <div class="legend" id="legend"></div>
@@ -131,89 +131,108 @@ const NAMES=['紅','藍','綠','黃'];
 const lerp=(a,b,t)=>a+(b-a)*t;
 const ease=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
 const sin=Math.sin, cos=Math.cos, PI=Math.PI;
-const P=(x,z,h,aL,aR,lean=0,sw=8,glow=0,turn=0)=>({x,z,h,aL,aR,lean,sw,glow,turn});
+const P=(x,z,h,aL,aR,lean=0,sw=8,glow=0,turn=0,fz=0)=>({x,z,h,aL,aR,lean,sw,glow,turn,fz});
 const mix=(a,b,k)=>{const o={};for(const key in a)o[key]=lerp(a[key],b[key]??a[key],k);return o};
+const F=p=>(p.fz=1,p);
+/* 依時間分段，段與段之間 1 秒平滑銜接 */
+function seq(t,parts,bl=1){let start=0;for(let j=0;j<parts.length;j++){const [end,fn]=parts[j];
+  if(t<end||j===parts.length-1){let p=fn(t);if(j>0&&t-start<bl)p=mix(parts[j-1][1](start),p,ease((t-start)/bl));return p}start=end}}
 
 const SEGS=[
- {key:'open',name:'開場',dur:8,wall:'點',wallSub:'POINT',ele:'點',
-  space:'四人散開成四個點',let:'低位／弱／靜止',
-  music:'環境音慢慢淡入（AI 音效）',bpm:0,ref:'dots',
-  refText:'整張圖的起點：先把四個人變成四個「點」。',
-  cues:['左後方蹲低，第 1 個彈起來','右前方蹲低，第 2 個彈起來','右後方蹲低，第 3 個彈起來','右邊蹲低，第 4 個彈起來'],
-  pose(i,t){const p=[[150,.75],[330,.15],[480,.8],[650,.3]][i];const tt=1.5+i*1.4;
-    const pop=Math.max(0,1-Math.abs(t-tt)/.7);const g=t>tt?Math.min(1,(t-tt)*2)*.45+pop*.55:0;
-    return P(p[0],p[1],.45+.28*pop,25+70*pop,25+70*pop,0,8,g)}},
- {key:'curve',name:'曲線',dur:25,wall:'線',wallSub:'LINE ・ 粗與細',ele:'線',
-  space:'兩人一組，斜對角站位',let:'低→中／強 vs 弱／慢 vs 快',
-  music:'約 70 BPM：大提琴長音（粗線）＋鋼琴高音短句（細線）',bpm:70,ref:'curves',
-  refText:'左邊一粗一細兩條曲線：紅綠演粗線，藍黃演細線。',
-  cues:['粗線：用軀幹帶動，動作大、慢、有重量','細線：用手臂和指尖，動作輕、快','粗線：跟紅同樣做法，在右邊','細線：跟藍同樣做法；0:25 起兩兩靠近，做一高一低的互補造型'],
+ {key:'open',name:'開場',dur:8,wall:'點',wallSub:'POINT ・ 高中低定像',ele:'點',
+  space:'四人散開成四個點',let:'高／中／低三種高度定像',
+  music:'環境音慢慢淡入（AI 音效）',bpm:0,ref:[],
+  refText:'整張圖的起點：四個人先是四個「點」，用高、中、低不同高度定像。',
+  cues:['高位定像（雙手舉高）；0:01 第 1 個活過來','中位定像；0:02 第 2 個活過來','低位定像（蹲低）；0:04 第 3 個活過來','中位定像；0:05 第 4 個活過來'],
+  pose(i,t){const p=[[180,.6,1,170],[340,.2,.72,90],[480,.7,.45,30],[640,.3,.72,90]][i];const tt=1.5+i*1.4;
+    const k=ease((t-tt)/.6);const fr=P(p[0],p[1],p[2],p[3],p[3],0,8,0,0,1);
+    const mv=P(p[0]+10*sin((t-tt)*2),p[1],p[2]+.05*sin((t-tt)*3),p[3]+25*sin((t-tt)*3),p[3]-25*sin((t-tt)*3),6*sin((t-tt)*2),8,.4);
+    return mix(fr,mv,k)}},
+
+ {key:'curve',name:'圓弧',dur:28,wall:'線',wallSub:'LINE ・ 由上往下、能量漸弱',ele:'線',
+  space:'兩人一組斜對角；粗線先動、細線定像，再交換',let:'高→中→低／強→弱／快→慢',
+  music:'約 70 BPM，由強到弱：大提琴長音＋鋼琴短句，樂器和音量慢慢減少',bpm:70,ref:['curves'],
+  refText:'左邊兩條圓弧由上往下流動、能量越來越弱：動作從高位、大力，流到低位、輕柔。',
+  cues:['粗線：0:08 先動，高位、動作大、有力；0:17 停在中位定像；0:26 一起往下流到低位','細線：0:08 先在低位定像；0:17 換你動，從中位往下流，輕、快；0:26 一起沉到地面','粗線：同紅（在右邊）','細線：同藍（在右邊）；0:33 全員低位定像'],
   pose(i,t){const b=[[200,.7],[300,.3],[500,.3],[600,.7]][i];const thick=i%2===0;const dir=thick?1:-1;
-    const hb=lerp(.5,.85,t/25);const k=ease((t-17)/3);let a,c;
-    if(thick){a=P(b[0],b[1],hb,90+70*sin(t*.9),90+70*sin(t*.9+PI),18*sin(t*.9),12);
-      c=P(b[0]+25*dir,b[1],.98,165,125,-10*dir,12);}
-    else{a=P(b[0]+30*sin(t*1.5),b[1],hb*.92+.05*sin(t*3),100+40*sin(t*4),100+40*sin(t*4+1.5),6*sin(t*3),5);
-      c=P(b[0]+40*dir,b[1],.5,95,80,15*dir,5);}
-    return mix(a,c,k)}},
- {key:'steps',name:'階梯',dur:22,wall:'線',wallSub:'LINE ・ 往上爬',ele:'線',
-  space:'從左下往右上斜線推進',let:'低→中→高／漸強／漸快',
-  music:'約 100 BPM：上行琶音，每上一階加一層樂器，加腳步節拍',bpm:100,ref:'steps',
-  refText:'三條一階比一階高的橫線：三個人各站一階，接力往上。',
-  cues:['第 1 階：蹲低，0:33 先進場，腳步交叉','第 2 階：半蹲，0:37 進場，前後步','第 3 階：站高，0:41 進場，0:47 雙手舉高','後方延伸：雙臂平舉當地平線，慢慢站高'],
-  pose(i,t){if(i===3)return P(690,.9,lerp(.6,.9,t/22),90+8*sin(t*1.2),90+8*sin(t*1.2),0,8);
-    const st=[[200,.15,.45],[370,.45,.72],[540,.75,1]][i],w=[[110,.2],[120,.5],[130,.8]][i];
-    const m=ease((t-i*4)/2.5);const f=100/60;const amp=t>13?14:8;const beat=sin(2*PI*f*t);
-    const walk=(m>0&&m<1)?.06*Math.abs(sin(PI*m*4)):0;
-    let arms=lerp(25,40,m);if(i===2)arms=lerp(arms,170,ease((t-14)/2));
-    return P(lerp(w[0],st[0],m)+amp*beat*m,lerp(w[1],st[1],m),lerp(.45,st[2],m)+.04*Math.abs(beat)*m+walk,arms,arms,5*beat*m,8)}},
- {key:'circle',name:'圓',dur:28,wall:'面→點',wallSub:'PLANE → POINT',ele:'面→點',
-  space:'大圓→小圓→中心一點',let:'中→高／能量收束／漸慢＋休止',
-  music:'循環旋律，樂器一層層抽掉，最後一聲「叮」（AI）＋靜音 1–2 拍',bpm:90,ref:'circles',
-  refText:'三個由大到小的圓：圓圈越轉越小，最後縮成一個點。',
-  cues:['一起圍大圓自轉；1:19 走到中心，指尖向上＝「點」','圍大圓自轉，越轉越小、越轉越慢；最後往外退、蹲低','同上','同上'],
-  pose(i,t){const tc=Math.min(t,22),u=ease(tc/22);const R=lerp(240,50,u),Rz=lerp(.36,.08,u);
-    const th=i*PI/2+2*tc-.04*tc*tc;const base=P(400+R*cos(th),.5+Rz*sin(th),lerp(.75,1,u),lerp(100,120,u),lerp(100,120,u),0,8);
-    if(t<24)return base;const k=ease((t-24)/2.5);
-    if(i===0)return mix(base,P(400,.42,1,20,178,0,8,1),k);
-    return mix(base,P(400+150*cos(th),.5+.28*sin(th),.45,30,30,0,8),k)}},
- {key:'duet',name:'雙人舞',dur:22,wall:'線＋面',wallSub:'雙人舞 ・ 牽手成線、轉圈成面',ele:'線＋面',
-  space:'兩對左右鏡像，同時進行',let:'中→高／流暢／轉圈加速、換位放慢',
-  music:'約 90 BPM 的搖擺律動（類似課堂練過的 Hit the Road Jack），兩對同步',bpm:90,ref:'curves',
-  refText:'原圖的兩條曲線交纏在一起，就像兩個人：這段把它變成真的雙人舞，也把「圓」接到「蹺蹺板」。',
-  cues:['帶領：1:27 牽起藍的手往斜上方高舉，帶她轉一圈；1:33 牽手換位；1:39 和藍一高一低交替','跟隨：1:28 在紅的手下逆時針轉一圈；1:33 換位；1:39 跟紅一低一高','帶領：和紅同樣動作，左右鏡像（在右邊）','跟隨：和藍同樣動作，左右鏡像'],
-  pose(i,t){
-    const cx=i<2?270:530; const side=[-1,1,1,-1][i]; const lead=i===0||i===2; const d=48;
-    const u=ease((t-10)/4), ph=PI*u;
-    const x=cx+side*d*cos(ph);
-    const z=.45+(lead?-.16:.16)*sin(ph);
-    const raise=ease((t-4)/1)*(1-ease((t-9)/1));             // 4–10 s 手高舉
-    const spin=lead?0:ease((t-5)/3);                          // 跟隨者轉一圈
-    const wave=ease((t-16)/1.5)*.18*sin(2*PI*(t-16)/3+(lead?0:PI));
-    const h=.85+(lead?0:.1*raise)+wave;
-    const inner=lerp(lerp(100,150,raise),95,ease((t-16)/1.5));
-    const outer=lead?60:lerp(60,30,raise);
-    const aL=side>0?inner:outer, aR=side>0?outer:inner;
-    return P(x,z,h,aL,aR,-side*4*sin(t*2),8,0,spin+.5*u)}},
- {key:'seesaw',name:'蹺蹺板',dur:25,wall:'面＋線',wallSub:'PLANE + LINE ・ 平衡',ele:'面＋線',
-  space:'中心支點，兩側對稱',let:'支點低位 vs 兩側高低交替／搖擺節奏',
-  music:'3/4 拍或搖擺節奏，兩個音色左右聲道輪流出現',bpm:90,ref:'seesaw',
-  refText:'右邊的三角形和橫線：綠當支點，黃當木板，紅藍是兩端。',
-  cues:['左端：一上一下；1:59 牽手轉圈和藍換邊','右端：跟紅相反，一下一上','支點：中心蹲低，手腳撐成三角形','木板：站在支點後方，雙臂平舉，跟著傾斜'],
-  pose(i,t){const amp=t<21?1:1-ease((t-21)/3);const s=sin(2*PI*t/4)*amp;
-    if(i===2)return P(400,.55,.42,38,38,0,11);
-    if(i===3)return P(400,.85,.85,90+22*s,90-22*s,0,8);
-    const u=ease((t-14)/6),ph=PI*u,spin=sin(ph);
+    const C=t=>{const k=ease((t-18)/7),A=(1-k);const base=thick?.75:.55;
+      return P(b[0],b[1],lerp(base,.42,k)+.03*A*sin(t*1.5),lerp(thick?125:100,40,k)+30*A*sin(t*.9),lerp(thick?55:90,40,k)-30*A*sin(t*.9),10*A*sin(t*.8),thick?12:5,0,0,t>25.5?1:0)};
+    if(thick)return seq(t,[
+      [9,t=>P(b[0],b[1],lerp(1,.85,t/9)+.04*sin(t*1.2),90+75*sin(t*1.1),90+75*sin(t*1.1+PI),20*sin(t*1.1),12)],
+      [18,t=>P(b[0]+15*dir,b[1],.75,125,55,-12*dir,12,0,0,1)],
+      [99,C]]);
+    return seq(t,[
+      [9,t=>P(b[0],b[1],.5,40,60,10*dir,5,0,0,1)],
+      [18,t=>{const u=(t-9)/9;return P(b[0]+25*sin(t*1.5),b[1],lerp(.85,.55,u)+.04*sin(t*3),100+35*(1-u*.4)*sin(t*4),100+35*(1-u*.4)*sin(t*4+1.5),6*sin(t*3),5)}],
+      [99,C]])}},
+
+ {key:'climb',name:'圈圈上階梯',dur:38,wall:'圓＋線',wallSub:'CIRCLES CLIMB THE STAIRS',ele:'面（圓）＋線（階梯）',
+  space:'從左下沿斜線往右上',let:'低→中→高／圓越往上越小／一人動、其他人定像',
+  music:'約 100 BPM：上行琶音，每有一個圓圈上台階就加一層樂器；1:11 一聲「叮」',bpm:100,ref:['steps','circles'],
+  refText:'三個圓圈像在爬階梯：越往上越小、越高。黃負責「鋪階梯」。',
+  cues:['大圓圈：0:38 轉著滾上第 1 階，低位定像（雙手圍大圓）','中圓圈：0:47 滾上第 2 階，中位定像','小圓圈：0:56 滾上第 3 階，高位定像（雙手圍小圓）','階梯：先跑到每一階後面平舉雙臂「鋪階梯」，圓圈到了就定像；1:05 四人一起轉一圈，1:11 定像'],
+  pose(i,t){const S=[[230,.15,.45,120],[390,.45,.72,145],[550,.75,1,168]];
+    const spinAll=t=>{const k=ease((t-29)/6);return k};
+    if(i===3){
+      return seq(t,[
+        [0.5,t=>P(170,.27,.5,90,90,0,8,0,0,1)],
+        [3,t=>P(270,.27,.5,90,90,0,8)],
+        [9,t=>P(270,.27,.5,90,90,0,8,0,0,1)],
+        [12,t=>P(430,.57,.72,90,90,0,8)],
+        [18,t=>P(430,.57,.72,90,90,0,8,0,0,1)],
+        [21,t=>P(590,.87,.95,90,90,0,8)],
+        [29,t=>P(590,.87,.95,90,90,0,8,0,0,1)],
+        [35,t=>P(590,.87,.95+.05*sin(PI*spinAll(t)),90,90,0,8,0,spinAll(t))],
+        [99,t=>P(590,.87,.95,90,90,0,8,.4,1,1)]]);
+    }
+    const s=S[i],w=[[70,.05],[60,.32],[80,.58]][i],st=2+i*9;
+    return seq(t,[
+      [st,t=>P(w[0],w[1],.42,130,130,0,8,0,0,1)],
+      [st+7,t=>{const u=ease((t-st)/7);return P(lerp(w[0],s[0],u),lerp(w[1],s[1],u),lerp(.42,s[2],u)+.1*Math.abs(sin(PI*u*3)),lerp(130,s[3],u),lerp(130,s[3],u),0,8,0,2*u)}],
+      [29,t=>P(s[0],s[1],s[2],s[3],s[3],0,8,0,0,1)],
+      [35,t=>{const k=spinAll(t);return P(s[0],s[1],s[2]+.06*sin(PI*k),s[3],s[3],0,8,0,k)}],
+      [99,t=>P(s[0],s[1],s[2],s[3],s[3],0,8,.4,1,1)]],.6)}},
+
+ {key:'duet',name:'雙人舞',dur:24,wall:'線＋面',wallSub:'雙人舞 ・ 一對跳、一對定像',ele:'線＋面',
+  space:'兩對左右鏡像，輪流動',let:'高 vs 低對比／流暢／轉圈',
+  music:'約 90 BPM 的搖擺律動（類似課堂練過的 Hit the Road Jack）',bpm:90,ref:[],
+  refText:'原圖沒有雙人舞的圖形：這段連接「圓」和「蹺蹺板」，兩人牽手連成線、轉圈成面。',
+  cues:['帶領：1:14 牽起藍的手高舉、帶她轉圈、換位；1:23 低位定像；1:32 兩對一起換位','跟隨：1:16 在紅手下轉一圈；1:23 高位定像；1:32 一起換位、一高一低交替','帶領：1:14 先高位定像；1:23 換你們跳（同紅的動作）；1:32 一起換位','跟隨：1:14 先低位定像；1:23 換你們跳（同藍的動作）；1:32 一起換位；1:36 全員定像'],
+  pose(i,t){const A=i<2,cx=A?270:530,side=[-1,1,1,-1][i],lead=i===0||i===2,d=48,t0=A?0:9;
+    const pos=t=>{const tau=t-t0;const sw=ease((tau-5)/3)+ease((t-18)/3);
+      return [cx+side*d*cos(PI*sw),.45+(lead?-.16:.16)*sin(PI*sw),sw]};
+    const arms=(inner,outer)=>side>0?[inner,outer]:[outer,inner];
+    const active=t=>{const tau=t-t0,[x,z,sw]=pos(t);const raise=ease(tau-1)*(1-ease(tau-5));
+      const spin=lead?0:ease((tau-2)/3);const [aL,aR]=arms(lerp(100,150,raise),lead?60:lerp(60,30,raise));
+      return P(x,z,.85+(lead?0:.1*raise),aL,aR,-side*4*sin(t*2),8,0,spin+.5*sw)};
+    const before=t=>{const [x,z,sw]=pos(t);const [aL,aR]=arms(lead?160:100,lead?120:40);return P(x,z,lead?1:.5,aL,aR,0,8,0,.5*sw,1)};
+    const after=t=>{const [x,z,sw]=pos(t);const [aL,aR]=arms(lead?100:160,lead?40:130);return P(x,z,lead?.5:1,aL,aR,0,8,0,(lead?0:1)+.5*sw,1)};
+    const fin=t=>{const [x,z,sw]=pos(t);const [aL,aR]=arms(95,60);
+      return P(x,z,.78+.17*sin(2*PI*(t-18)/3+(lead?0:PI)),aL,aR,0,8,0,(lead?0:1)+.5*sw,t>22.5?1:0)};
+    return A?seq(t,[[9,active],[18,after],[99,fin]]):seq(t,[[9,before],[18,active],[99,fin]])}},
+
+ {key:'seesaw',name:'蹺蹺板',dur:27,wall:'面＋線',wallSub:'PLANE + LINE ・ 平衡',ele:'面＋線',
+  space:'中心支點，兩側對稱',let:'支點低／木板中／兩端一高一低＋兩次定像',
+  music:'3/4 拍或搖擺節奏，兩個音色左右聲道輪流；定像時音樂停一拍',bpm:90,ref:['seesaw'],
+  refText:'右邊的三角形是蹺蹺板：綠當支點，黃當木板，紅藍坐兩端。',
+  cues:['左端：一上一下；1:43、1:51 停在最高或最低點定像；1:56 牽手轉圈和藍換邊','右端：跟紅相反；定像時一個高、一個低','支點：中心低位，手腳撐成三角形，全程不動','木板：站在支點後方、中位，雙臂平舉跟著傾斜；定像時一起停'],
+  pose(i,t){const hold=(t>=5&&t<7)||(t>=13&&t<15);
+    const te=t-Math.max(0,Math.min(t,7)-5)-Math.max(0,Math.min(t,15)-13);
+    const amp=te<20?1:1-ease((te-20)/3);const s=sin(2*PI*te/4)*amp;const fz=hold?1:0;
+    if(i===2)return P(400,.55,.42,38,38,0,11,0,0,1);
+    if(i===3)return P(400,.85,.78,90+22*s,90-22*s,0,8,0,0,fz);
+    const u=ease((te-14)/6),ph=PI*u,spin=sin(ph);
     const x=i===0?400-150*cos(ph):400+150*cos(ph);const z=i===0?.35-.25*spin:.35+.3*spin;
     const left=(i===0)!==(u>.5);const so=left?s:-s;
-    const h=lerp(.7+.22*so,.9,spin);const ar=lerp(90+60*so,170,spin);
-    return P(x,z,h,ar,ar,-12*so*(1-spin),8,0,u)}},
+    return P(x,z,lerp(.7+.26*so,.9,spin),lerp(90+60*so,170,spin),lerp(90+60*so,170,spin),-12*so*(1-spin),8,0,u,fz)}},
+
  {key:'end',name:'結尾',dur:10,wall:'點線面',wallSub:'回到整張圖',ele:'點線面',
-  space:'回到原圖的構圖',let:'靜止／收束',
-  music:'回到第 1 段的長音，淡出',bpm:0,ref:'all',
-  refText:'全員回到原圖的位置定格，讓觀眾一眼看出這張圖。',
-  cues:['粗曲線：高位，手臂彎成弧','細曲線：低位，身體往右延伸','圓：站中間，雙手圍成圓','蹺蹺板：雙臂平舉，定格到音樂結束'],
-  pose(i,t){const T=[P(190,.4,1,160,120,-14,12),P(270,.15,.5,60,115,18,5),P(430,.5,.85,140,140,0,8),P(620,.5,.85,90,90,0,8)][i];
-    T.glow=ease((t-6)/2)*.5;T.turn=1;return T}}
+  space:'回到原圖的構圖',let:'高／中／低同時定像',
+  music:'回到第 1 段的長音，淡出',bpm:0,ref:['curves','steps','circles','seesaw'],
+  refText:'全員回到原圖的位置定格：圓弧、圈圈上階梯、蹺蹺板一次呈現。',
+  cues:['上方圓弧：高位，手臂彎成弧','下方圓弧：低位，身體往右延伸','階梯上的圓圈：高位，雙手圍小圓','蹺蹺板：中位，雙臂平舉，定像到音樂結束'],
+  pose(i,t){const T=[P(190,.4,1,160,120,-14,12),P(270,.15,.48,60,115,18,5),P(470,.6,1,168,168,0,8),P(620,.4,.75,70,110,0,8)][i];
+    T.glow=ease((t-6)/2)*.5;T.turn=1;T.fz=ease((t-3)/1);return T}}
 ];
 let acc=0;SEGS.forEach(s=>{s.start=acc;acc+=s.dur});const TOTAL=acc;
 
@@ -243,7 +262,10 @@ const figs=COLORS.map((c,i)=>{
   const head=el('circle',{r:14,fill:c},g);
   const num=el('text',{'text-anchor':'middle','font-size':14,'font-weight':900,fill:'#fff','dominant-baseline':'central'},g);
   num.textContent=i+1;
-  return {root,shadow,g,glow,legL,legR,armL,armR,torso,head,num};
+  const badge=el('g',{opacity:0},root);
+  el('rect',{x:-15,y:-11,width:30,height:22,rx:7,fill:'#1d1b18'},badge);
+  const bt=el('text',{'text-anchor':'middle','font-size':13,'font-weight':900,fill:'#fff','dominant-baseline':'central'},badge);bt.textContent='定';
+  return {root,shadow,g,glow,legL,legR,armL,armR,torso,head,num,badge};
 });
 function drawPerson(f,p){
   const [X,Y,s]=proj(p.x,p.z);
@@ -263,7 +285,9 @@ function drawPerson(f,p){
   f.armR.setAttribute('x2',9+sin(ra(p.aR))*L);f.armR.setAttribute('y2',sy+cos(ra(p.aR))*L);
   f.armL.setAttribute('stroke-width',p.sw);f.armR.setAttribute('stroke-width',p.sw);
   const hy=sh-17;f.head.setAttribute('cy',hy);f.num.setAttribute('y',hy);
-  f.glow.setAttribute('cy',hy);f.glow.setAttribute('opacity',Math.max(0,Math.min(1,p.glow))*.85);
+  f.glow.setAttribute('cy',hy);
+  const bs=s*1.35;f.badge.setAttribute('transform',`translate(${X},${Y+(hy-40)*bs}) scale(${Math.max(.75,bs)})`);
+  f.badge.setAttribute('opacity',Math.max(0,Math.min(1,p.fz)));f.glow.setAttribute('opacity',Math.max(0,Math.min(1,p.glow))*.85);
 }
 
 /* ---------- floor guides ---------- */
@@ -272,10 +296,11 @@ function guide(k){
   pathsG.innerHTML='';
   const line=(pts,dash=true,col='#cbbfa8',w=2.5)=>el('polyline',{points:pts.map(([x,z])=>proj(x,z).slice(0,2).join(',')).join(' '),fill:'none',stroke:col,'stroke-width':w,'stroke-dasharray':dash?'7 7':'','stroke-linecap':'round'},pathsG);
   const key=SEGS[k].key;
+  const ring=(cx,cz,R,Rz,dash=true)=>{const pts=[];for(let a=0;a<=48;a++){const t=a/48*2*PI;pts.push([cx+R*cos(t),cz+Rz*sin(t)])}line(pts,dash)};
   if(key==='curve'){line([[200,.7],[300,.3]]);line([[500,.3],[600,.7]])}
-  if(key==='steps'){line([[200,.15],[370,.45],[540,.75]]);[[200,.15],[370,.45],[540,.75]].forEach(([x,z])=>line([[x-60,z],[x+60,z]],false,'#d8ceba',4))}
-  if(key==='circle'){[240,140,60].forEach((R,j)=>{const pts=[];for(let a=0;a<=64;a++){const t=a/64*2*PI;pts.push([400+R*cos(t),.5+lerp(.36,.08,(240-R)/190)*sin(t)])}line(pts,j!==2)})}
-  if(key==='duet'){[270,530].forEach(cx=>{const pts=[];for(let a=0;a<=48;a++){const t=a/48*2*PI;pts.push([cx+48*cos(t),.45+.16*sin(t)])}line(pts)})}
+  if(key==='climb'){line([[70,.05],[230,.15],[390,.45],[550,.75]]);
+    [[230,.15,60],[390,.45,45],[550,.75,32]].forEach(([x,z,R])=>{line([[x-70,z],[x+70,z]],false,'#d8ceba',4);ring(x,z,R,.05,true)})}
+  if(key==='duet'){ring(270,.45,48,.16);ring(530,.45,48,.16)}
   if(key==='seesaw'){line([[230,.35],[570,.35]]);const [a,b]=proj(400,.55);el('polygon',{points:`${a},${b-34} ${a-26},${b+6} ${a+26},${b+6}`,fill:'#e2d9c7'},pathsG)}
 }
 
@@ -283,20 +308,12 @@ function guide(k){
 const ref=document.getElementById('ref');
 ref.innerHTML=`
 <g data-k="curves" fill="none" stroke-linecap="butt"><path d="M490 685 C 430 520 420 400 520 375 C 600 355 700 365 780 383" stroke-width="14"/><path d="M400 875 C 420 750 460 690 520 678 C 570 670 620 695 658 723" stroke-width="5"/></g>
-<g data-k="steps" stroke-width="5"><line x1="618" y1="877" x2="1017" y2="877"/><line x1="922" y1="782" x2="1322" y2="782"/><line x1="1260" y1="687" x2="1660" y2="687" data-k2="seesaw"/></g>
+<g data-k="steps" stroke-width="5"><line x1="618" y1="877" x2="1017" y2="877"/><line x1="922" y1="782" x2="1322" y2="782"/></g>
 <g data-k="circles" fill="none" stroke-width="5"><circle cx="1023" cy="589" r="97"/><circle cx="1244" cy="462" r="75"/><circle cx="1424" cy="384" r="51"/></g>
-<g data-k="seesaw"><polygon points="1458,688 1358,858 1557,858" stroke-width="0"/></g>`;
-function refHi(key){
-  ref.querySelectorAll('g').forEach(g=>{
-    const k=g.dataset.k;
-    let on=key==='all'||key===k||(key==='seesaw'&&k==='steps');
-    const col=on?'#1d1b18':'#d8d2c6';
-    g.querySelectorAll('*').forEach(e=>{
-      let c=col;if(key==='seesaw'&&k==='steps'&&!e.dataset.k2)c='#d8d2c6';
-      if(key==='dots')c='#d8d2c6';
-      e.setAttribute('stroke',c);if(e.tagName==='polygon')e.setAttribute('fill',c);
-    });
-  });
+<g data-k="seesaw" stroke-width="5"><line x1="1260" y1="687" x2="1660" y2="687"/><polygon points="1458,688 1358,858 1557,858" stroke-width="0"/></g>`;
+function refHi(keys){
+  ref.querySelectorAll('g').forEach(g=>{const c=keys.includes(g.dataset.k)?'#1d1b18':'#d8d2c6';
+    g.querySelectorAll('*').forEach(e=>{e.setAttribute('stroke',c);if(e.tagName==='polygon')e.setAttribute('fill',c)})});
 }
 
 /* ---------- UI ---------- */

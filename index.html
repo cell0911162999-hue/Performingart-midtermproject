@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>期中展演・兩分鐘走位動畫</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1d1b18; --muted:#6f6a62; --paper:#f6f2ea; --card:#fffdf8; --line:#e3ddd1;
+    --c0:#E4572E; --c1:#2E86DE; --c2:#2BAE66; --c3:#E9A800;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans TC",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:780px;margin:0 auto;padding:14px 14px 40px}
+  header h1{font-size:20px;font-weight:900;margin:4px 0 2px;letter-spacing:.02em}
+  header p{margin:0 0 10px;color:var(--muted);font-size:13px}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .chip{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 5px;font-size:13px;font-weight:500}
+  .dot{width:20px;height:20px;border-radius:50%;color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;flex:none}
+  .stage{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  svg#stage{display:block;width:100%;height:auto}
+  .controls{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--line)}
+  button{font-family:inherit;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700;color:var(--ink);cursor:pointer}
+  button.primary{background:var(--ink);color:#fff;border-color:var(--ink);min-width:64px}
+  .time{font-variant-numeric:tabular-nums;font-weight:700;font-size:15px;margin-left:auto}
+  .speed{display:flex;gap:4px}
+  .speed button{padding:6px 8px;font-size:12px}
+  .speed button.on{background:#ebe5d8}
+  .timeline{position:relative;height:34px;margin:0 12px 12px;cursor:pointer;touch-action:none}
+  .bands{position:absolute;inset:8px 0 8px 0;display:flex;border-radius:6px;overflow:hidden}
+  .band{height:100%;border-right:2px solid var(--card);display:grid;place-items:center;font-size:10px;font-weight:700;color:#5b554c;background:#ece6da;white-space:nowrap;overflow:hidden}
+  .band.on{background:#d9cfbc;color:var(--ink)}
+  .head{position:absolute;top:2px;bottom:2px;width:3px;background:var(--ink);border-radius:2px;transform:translateX(-1px)}
+  .segs{display:flex;gap:6px;overflow-x:auto;padding:12px 0 4px;scrollbar-width:none}
+  .segs button{flex:none;font-size:13px;padding:7px 11px}
+  .segs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:8px}
+  .card h2{margin:0;font-size:18px;font-weight:900}
+  .card .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px}
+  .tag{font-size:12px;background:#f1ece1;border-radius:8px;padding:4px 8px}
+  .tag b{font-weight:700;margin-right:4px}
+  .cues{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:8px}
+  .cues li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5}
+  .music{display:flex;gap:10px;align-items:center;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);font-size:13px;color:#3d3933}
+  .pulse{width:14px;height:14px;border-radius:50%;background:var(--ink);flex:none;transition:transform .05s}
+  .ref{display:flex;gap:12px;align-items:center;margin-top:8px}
+  .ref svg{width:150px;flex:none;background:#fff;border:1px solid var(--line);border-radius:10px}
+  .ref p{margin:0;font-size:13px;color:var(--muted);line-height:1.5}
+  .note{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6}
+.music-up{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 12px 12px;font-size:13px}
+  .music-up label{display:inline-flex;align-items:center;gap:6px;border:1px dashed #b9ad97;background:#fbf8f2;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer}
+  .music-up input{display:none}
+  .music-up .fname{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
+  .music-up .warn{color:#b4541f;width:100%}
+  .music-up button{padding:6px 10px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>期中展演・兩分鐘走位動畫</h1>
+    <p>正面看舞台（觀眾視角）。人越往後越小；身體越矮代表 level 越低。</p>
+  </header>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="stage">
+    <svg id="stage" viewBox="0 0 800 440" aria-label="舞台走位動畫">
+      <defs>
+        <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#efe9dd"/><stop offset="1" stop-color="#e6dfd0"/>
+        </linearGradient>
+        <filter id="blur" x="-1" y="-1" width="3" height="3"><feGaussianBlur stdDeviation="6"/></filter>
+      </defs>
+      <rect x="0" y="0" width="800" height="230" fill="url(#wall)"/>
+      <polygon points="0,440 800,440 655,230 145,230" fill="#f8f4ec"/>
+      <line x1="145" y1="230" x2="655" y2="230" stroke="#d6cdbb" stroke-width="2"/>
+      <text id="wallText" x="400" y="140" text-anchor="middle" font-size="86" font-weight="900" fill="#d9d0bf" opacity=".9"></text>
+      <text id="wallSub" x="400" y="190" text-anchor="middle" font-size="18" font-weight="700" fill="#b7ac97"></text>
+      <text x="400" y="432" text-anchor="middle" font-size="12" fill="#b7ac97">▲ 觀眾</text>
+      <g id="paths"></g>
+      <g id="people"></g>
+    </svg>
+    <div class="controls">
+      <button class="primary" id="play">▶ 播放</button>
+      <button id="restart" aria-label="從頭">⟲</button>
+      <div class="speed" id="speed">
+        <button data-s="0.5">0.5×</button><button data-s="1" class="on">1×</button><button data-s="2">2×</button>
+      </div>
+      <span class="time" id="time">0:00 / 2:20</span>
+    </div>
+    <div class="timeline" id="timeline">
+      <div class="bands" id="bands"></div>
+      <div class="head" id="headbar"></div>
+    </div>
+    <div class="music-up">
+      <label>♪ 上傳音樂檔<input type="file" id="musicFile" accept="audio/*"></label>
+      <span class="fname" id="fname">尚未選擇音樂（mp3、m4a、wav 都可以）</span>
+      <button id="musicClear" hidden>移除</button>
+      <span class="warn" id="mwarn" hidden></span>
+    </div>
+  </div>
+
+  <div class="segs" id="segs"></div>
+
+  <div class="card">
+    <h2 id="segTitle"></h2>
+    <div class="sub" id="segSub"></div>
+    <div class="tags" id="segTags"></div>
+    <ul class="cues" id="segCues"></ul>
+    <div class="music"><span class="pulse" id="pulse"></span><span id="segMusic"></span></div>
+  </div>
+
+  <div class="card">
+    <div style="font-weight:700;font-size:14px">對應原圖</div>
+    <div class="ref">
+      <svg id="ref" viewBox="330 300 1400 620" aria-label="原始圖像"></svg>
+      <p id="refText"></p>
+    </div>
+  </div>
+
+  <p class="note">動畫是走位示意，動作細節以排練為準。拖曳下方時間軸可以跳到任一秒；點段落按鈕可以直接看該段。上傳的音樂只在你自己的瀏覽器裡播放，不會傳到網路上；重新整理頁面後要再選一次。</p>
+</div>
+
+<script>
+const COLORS=['#E4572E','#2E86DE','#2BAE66','#E9A800'];
+const NAMES=['紅','藍','綠','黃'];
+const lerp=(a,b,t)=>a+(b-a)*t;
+const ease=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
+const sin=Math.sin, cos=Math.cos, PI=Math.PI;
+const P=(x,z,h,aL,aR,lean=0,sw=8,glow=0,turn=0)=>({x,z,h,aL,aR,lean,sw,glow,turn});
+const mix=(a,b,k)=>{const o={};for(const key in a)o[key]=lerp(a[key],b[key]??a[key],k);return o};
+
+const SEGS=[
+ {key:'open',name:'開場',dur:8,wall:'點',wallSub:'POINT',ele:'點',
+  space:'四人散開成四個點',let:'低位／弱／靜止',
+  music:'環境音慢慢淡入（AI 音效）',bpm:0,ref:'dots',
+  refText:'整張圖的起點：先把四個人變成四個「點」。',
+  cues:['左後方蹲低，第 1 個彈起來','右前方蹲低，第 2 個彈起來','右後方蹲低，第 3 個彈起來','右邊蹲低，第 4 個彈起來'],
+  pose(i,t){const p=[[150,.75],[330,.15],[480,.8],[650,.3]][i];const tt=1.5+i*1.4;
+    const pop=Math.max(0,1-Math.abs(t-tt)/.7);const g=t>tt?Math.min(1,(t-tt)*2)*.45+pop*.55:0;
+    return P(p[0],p[1],.45+.28*pop,25+70*pop,25+70*pop,0,8,g)}},
+ {key:'curve',name:'曲線',dur:25,wall:'線',wallSub:'LINE ・ 粗與細',ele:'線',
+  space:'兩人一組，斜對角站位',let:'低→中／強 vs 弱／慢 vs 快',
+  music:'約 70 BPM：大提琴長音（粗線）＋鋼琴高音短句（細線）',bpm:70,ref:'curves',
+  refText:'左邊一粗一細兩條曲線：紅綠演粗線，藍黃演細線。',
+  cues:['粗線：用軀幹帶動，動作大、慢、有重量','細線：用手臂和指尖，動作輕、快','粗線：跟紅同樣做法，在右邊','細線：跟藍同樣做法；0:25 起兩兩靠近，做一高一低的互補造型'],
+  pose(i,t){const b=[[200,.7],[300,.3],[500,.3],[600,.7]][i];const thick=i%2===0;const dir=thick?1:-1;
+    const hb=lerp(.5,.85,t/25);const k=ease((t-17)/3);let a,c;
+    if(thick){a=P(b[0],b[1],hb,90+70*sin(t*.9),90+70*sin(t*.9+PI),18*sin(t*.9),12);
+      c=P(b[0]+25*dir,b[1],.98,165,125,-10*dir,12);}
+    else{a=P(b[0]+30*sin(t*1.5),b[1],hb*.92+.05*sin(t*3),100+40*sin(t*4),100+40*sin(t*4+1.5),6*sin(t*3),5);
+      c=P(b[0]+40*dir,b[1],.5,95,80,15*dir,5);}
+    return mix(a,c,k)}},
+ {key:'steps',name:'階梯',dur:22,wall:'線',wallSub:'LINE ・ 往上爬',ele:'線',
+  space:'從左下往右上斜線推進',let:'低→中→高／漸強／漸快',
+  music:'約 100 BPM：上行琶音，每上一階加一層樂器，加腳步節拍',bpm:100,ref:'steps',
+  refText:'三條一階比一階高的橫線：三個人各站一階，接力往上。',
+  cues:['第 1 階：蹲低，0:33 先進場，腳步交叉','第 2 階：半蹲，0:37 進場，前後步','第 3 階：站高，0:41 進場，0:47 雙手舉高','後方延伸：雙臂平舉當地平線，慢慢站高'],
+  pose(i,t){if(i===3)return P(690,.9,lerp(.6,.9,t/22),90+8*sin(t*1.2),90+8*sin(t*1.2),0,8);
+    const st=[[200,.15,.45],[370,.45,.72],[540,.75,1]][i],w=[[110,.2],[120,.5],[130,.8]][i];
+    const m=ease((t-i*4)/2.5);const f=100/60;const amp=t>13?14:8;const beat=sin(2*PI*f*t);
+    const walk=(m>0&&m<1)?.06*Math.abs(sin(PI*m*4)):0;
+    let arms=lerp(25,40,m);if(i===2)arms=lerp(arms,170,ease((t-14)/2));
+    return P(lerp(w[0],st[0],m)+amp*beat*m,lerp(w[1],st[1],m),lerp(.45,st[2],m)+.04*Math.abs(beat)*m+walk,arms,arms,5*beat*m,8)}},
+ {key:'circle',name:'圓',dur:28,wall:'面→點',wallSub:'PLANE → POINT',ele:'面→點',
+  space:'大圓→小圓→中心一點',let:'中→高／能量收束／漸慢＋休止',
+  music:'循環旋律，樂器一層層抽掉，最後一聲「叮」（AI）＋靜音 1–2 拍',bpm:90,ref:'circles',
+  refText:'三個由大到小的圓：圓圈越轉越小，最後縮成一個點。',
+  cues:['一起圍大圓自轉；1:19 走到中心，指尖向上＝「點」','圍大圓自轉，越轉越小、越轉越慢；最後往外退、蹲低','同上','同上'],
+  pose(i,t){const tc=Math.min(t,22),u=ease(tc/22);const R=lerp(240,50,u),Rz=lerp(.36,.08,u);
+    const th=i*PI/2+2*tc-.04*tc*tc;const base=P(400+R*cos(th),.5+Rz*sin(th),lerp(.75,1,u),lerp(100,120,u),lerp(100,120,u),0,8);
+    if(t<24)return base;const k=ease((t-24)/2.5);
+    if(i===0)return mix(base,P(400,.42,1,20,178,0,8,1),k);
+    return mix(base,P(400+150*cos(th),.5+.28*sin(th),.45,30,30,0,8),k)}},
+ {key:'duet',name:'雙人舞',dur:22,wall:'線＋面',wallSub:'雙人舞 ・ 牽手成線、轉圈成面',ele:'線＋面',
+  space:'兩對左右鏡像，同時進行',let:'中→高／流暢／轉圈加速、換位放慢',
+  music:'約 90 BPM 的搖擺律動（類似課堂練過的 Hit the Road Jack），兩對同步',bpm:90,ref:'curves',
+  refText:'原圖的兩條曲線交纏在一起，就像兩個人：這段把它變成真的雙人舞，也把「圓」接到「蹺蹺板」。',
+  cues:['帶領：1:27 牽起藍的手往斜上方高舉，帶她轉一圈；1:33 牽手換位；1:39 和藍一高一低交替','跟隨：1:28 在紅的手下逆時針轉一圈；1:33 換位；1:39 跟紅一低一高','帶領：和紅同樣動作，左右鏡像（在右邊）','跟隨：和藍同樣動作，左右鏡像'],
+  pose(i,t){
+    const cx=i<2?270:530; const side=[-1,1,1,-1][i]; const lead=i===0||i===2; const d=48;
+    const u=ease((t-10)/4), ph=PI*u;
+    const x=cx+side*d*cos(ph);
+    const z=.45+(lead?-.16:.16)*sin(ph);
+    const raise=ease((t-4)/1)*(1-ease((t-9)/1));             // 4–10 s 手高舉
+    const spin=lead?0:ease((t-5)/3);                          // 跟隨者轉一圈
+    const wave=ease((t-16)/1.5)*.18*sin(2*PI*(t-16)/3+(lead?0:PI));
+    const h=.85+(lead?0:.1*raise)+wave;
+    const inner=lerp(lerp(100,150,raise),95,ease((t-16)/1.5));
+    const outer=lead?60:lerp(60,30,raise);
+    const aL=side>0?inner:outer, aR=side>0?outer:inner;
+    return P(x,z,h,aL,aR,-side*4*sin(t*2),8,0,spin+.5*u)}},
+ {key:'seesaw',name:'蹺蹺板',dur:25,wall:'面＋線',wallSub:'PLANE + LINE ・ 平衡',ele:'面＋線',
+  space:'中心支點，兩側對稱',let:'支點低位 vs 兩側高低交替／搖擺節奏',
+  music:'3/4 拍或搖擺節奏，兩個音色左右聲道輪流出現',bpm:90,ref:'seesaw',
+  refText:'右邊的三角形和橫線：綠當支點，黃當木板，紅藍是兩端。',
+  cues:['左端：一上一下；1:59 牽手轉圈和藍換邊','右端：跟紅相反，一下一上','支點：中心蹲低，手腳撐成三角形','木板：站在支點後方，雙臂平舉，跟著傾斜'],
+  pose(i,t){const amp=t<21?1:1-ease((t-21)/3);const s=sin(2*PI*t/4)*amp;
+    if(i===2)return P(400,.55,.42,38,38,0,11);
+    if(i===3)return P(400,.85,.85,90+22*s,90-22*s,0,8);
+    const u=ease((t-14)/6),ph=PI*u,spin=sin(ph);
+    const x=i===0?400-150*cos(ph):400+150*cos(ph);const z=i===0?.35-.25*spin:.35+.3*spin;
+    const left=(i===0)!==(u>.5);const so=left?s:-s;
+    const h=lerp(.7+.22*so,.9,spin);const ar=lerp(90+60*so,170,spin);
+    return P(x,z,h,ar,ar,-12*so*(1-spin),8,0,u)}},
+ {key:'end',name:'結尾',dur:10,wall:'點線面',wallSub:'回到整張圖',ele:'點線面',
+  space:'回到原圖的構圖',let:'靜止／收束',
+  music:'回到第 1 段的長音，淡出',bpm:0,ref:'all',
+  refText:'全員回到原圖的位置定格，讓觀眾一眼看出這張圖。',
+  cues:['粗曲線：高位，手臂彎成弧','細曲線：低位，身體往右延伸','圓：站中間，雙手圍成圓','蹺蹺板：雙臂平舉，定格到音樂結束'],
+  pose(i,t){const T=[P(190,.4,1,160,120,-14,12),P(270,.15,.5,60,115,18,5),P(430,.5,.85,140,140,0,8),P(620,.5,.85,90,90,0,8)][i];
+    T.glow=ease((t-6)/2)*.5;T.turn=1;return T}}
+];
+let acc=0;SEGS.forEach(s=>{s.start=acc;acc+=s.dur});const TOTAL=acc;
+
+function poseAt(i,t){
+  let k=SEGS.length-1;for(let j=0;j<SEGS.length;j++){if(t<SEGS[j].start+SEGS[j].dur){k=j;break}}
+  const s=SEGS[k],tl=Math.min(t-s.start,s.dur);let p=s.pose(i,tl);
+  const bd=SEGS[k].key==='end'?3:2.5;
+  if(k>0&&tl<bd){const pr=SEGS[k-1];p=mix(pr.pose(i,pr.dur),p,ease(tl/bd))}
+  return {p,k,tl};
+}
+const proj=(x,z)=>{const s=1-.35*z;return [400+(x-400)*s,410-180*z,s]};
+
+/* ---------- people ---------- */
+const NS='http://www.w3.org/2000/svg';
+const el=(tag,attrs,parent)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent&&parent.appendChild(e);return e};
+const peopleG=document.getElementById('people');
+const figs=COLORS.map((c,i)=>{
+  const root=el('g',{},peopleG);
+  const shadow=el('ellipse',{rx:22,ry:6,fill:'#000',opacity:.08},root);
+  const g=el('g',{},root);
+  const glow=el('circle',{r:26,fill:c,filter:'url(#blur)',opacity:0},g);
+  const legL=el('polyline',{fill:'none',stroke:c,'stroke-linecap':'round','stroke-linejoin':'round'},g);
+  const legR=el('polyline',{fill:'none',stroke:c,'stroke-linecap':'round','stroke-linejoin':'round'},g);
+  const armL=el('line',{stroke:c,'stroke-linecap':'round'},g);
+  const armR=el('line',{stroke:c,'stroke-linecap':'round'},g);
+  const torso=el('rect',{x:-12,width:24,rx:11,fill:c},g);
+  const head=el('circle',{r:14,fill:c},g);
+  const num=el('text',{'text-anchor':'middle','font-size':14,'font-weight':900,fill:'#fff','dominant-baseline':'central'},g);
+  num.textContent=i+1;
+  return {root,shadow,g,glow,legL,legR,armL,armR,torso,head,num};
+});
+function drawPerson(f,p){
+  const [X,Y,s]=proj(p.x,p.z);
+  f.shadow.setAttribute('cx',X);f.shadow.setAttribute('cy',Y+2);f.shadow.setAttribute('rx',24*s);f.shadow.setAttribute('ry',6*s);
+  f.g.setAttribute('transform',`translate(${X},${Y}) scale(${s*1.35}) rotate(${p.lean}) scale(${.3+.7*Math.abs(cos(2*PI*p.turn))},1)`);
+  const h=Math.max(.38,Math.min(1.05,p.h));
+  const legs=8+58*(h-.38)/.62, hip=-legs, sh=hip-38, kx=(1-h)*20;
+  f.legL.setAttribute('points',`-7,0 ${-7-kx},${hip/2} -6,${hip}`);
+  f.legR.setAttribute('points',`7,0 ${7+kx},${hip/2} 6,${hip}`);
+  [f.legL,f.legR].forEach(l=>l.setAttribute('stroke-width',8));
+  f.torso.setAttribute('y',sh);f.torso.setAttribute('height',38+6);
+  const L=44,sy=sh+6;
+  const ra=a=>a*PI/180;
+  f.armL.setAttribute('x1',-9);f.armL.setAttribute('y1',sy);
+  f.armL.setAttribute('x2',-9-sin(ra(p.aL))*L);f.armL.setAttribute('y2',sy+cos(ra(p.aL))*L);
+  f.armR.setAttribute('x1',9);f.armR.setAttribute('y1',sy);
+  f.armR.setAttribute('x2',9+sin(ra(p.aR))*L);f.armR.setAttribute('y2',sy+cos(ra(p.aR))*L);
+  f.armL.setAttribute('stroke-width',p.sw);f.armR.setAttribute('stroke-width',p.sw);
+  const hy=sh-17;f.head.setAttribute('cy',hy);f.num.setAttribute('y',hy);
+  f.glow.setAttribute('cy',hy);f.glow.setAttribute('opacity',Math.max(0,Math.min(1,p.glow))*.85);
+}
+
+/* ---------- floor guides ---------- */
+const pathsG=document.getElementById('paths');
+function guide(k){
+  pathsG.innerHTML='';
+  const line=(pts,dash=true,col='#cbbfa8',w=2.5)=>el('polyline',{points:pts.map(([x,z])=>proj(x,z).slice(0,2).join(',')).join(' '),fill:'none',stroke:col,'stroke-width':w,'stroke-dasharray':dash?'7 7':'','stroke-linecap':'round'},pathsG);
+  const key=SEGS[k].key;
+  if(key==='curve'){line([[200,.7],[300,.3]]);line([[500,.3],[600,.7]])}
+  if(key==='steps'){line([[200,.15],[370,.45],[540,.75]]);[[200,.15],[370,.45],[540,.75]].forEach(([x,z])=>line([[x-60,z],[x+60,z]],false,'#d8ceba',4))}
+  if(key==='circle'){[240,140,60].forEach((R,j)=>{const pts=[];for(let a=0;a<=64;a++){const t=a/64*2*PI;pts.push([400+R*cos(t),.5+lerp(.36,.08,(240-R)/190)*sin(t)])}line(pts,j!==2)})}
+  if(key==='duet'){[270,530].forEach(cx=>{const pts=[];for(let a=0;a<=48;a++){const t=a/48*2*PI;pts.push([cx+48*cos(t),.45+.16*sin(t)])}line(pts)})}
+  if(key==='seesaw'){line([[230,.35],[570,.35]]);const [a,b]=proj(400,.55);el('polygon',{points:`${a},${b-34} ${a-26},${b+6} ${a+26},${b+6}`,fill:'#e2d9c7'},pathsG)}
+}
+
+/* ---------- reference image ---------- */
+const ref=document.getElementById('ref');
+ref.innerHTML=`
+<g data-k="curves" fill="none" stroke-linecap="butt"><path d="M490 685 C 430 520 420 400 520 375 C 600 355 700 365 780 383" stroke-width="14"/><path d="M400 875 C 420 750 460 690 520 678 C 570 670 620 695 658 723" stroke-width="5"/></g>
+<g data-k="steps" stroke-width="5"><line x1="618" y1="877" x2="1017" y2="877"/><line x1="922" y1="782" x2="1322" y2="782"/><line x1="1260" y1="687" x2="1660" y2="687" data-k2="seesaw"/></g>
+<g data-k="circles" fill="none" stroke-width="5"><circle cx="1023" cy="589" r="97"/><circle cx="1244" cy="462" r="75"/><circle cx="1424" cy="384" r="51"/></g>
+<g data-k="seesaw"><polygon points="1458,688 1358,858 1557,858" stroke-width="0"/></g>`;
+function refHi(key){
+  ref.querySelectorAll('g').forEach(g=>{
+    const k=g.dataset.k;
+    let on=key==='all'||key===k||(key==='seesaw'&&k==='steps');
+    const col=on?'#1d1b18':'#d8d2c6';
+    g.querySelectorAll('*').forEach(e=>{
+      let c=col;if(key==='seesaw'&&k==='steps'&&!e.dataset.k2)c='#d8d2c6';
+      if(key==='dots')c='#d8d2c6';
+      e.setAttribute('stroke',c);if(e.tagName==='polygon')e.setAttribute('fill',c);
+    });
+  });
+}
+
+/* ---------- UI ---------- */
+const $=id=>document.getElementById(id);
+$('legend').innerHTML=COLORS.map((c,i)=>`<span class="chip"><span class="dot" style="background:${c}">${i+1}</span>${i+1} 號・${NAMES[i]}</span>`).join('');
+$('bands').innerHTML=SEGS.map((s,k)=>`<div class="band" data-k="${k}" style="width:${s.dur/TOTAL*100}%">${s.name}</div>`).join('');
+$('segs').innerHTML=SEGS.map((s,k)=>`<button data-k="${k}">${k} ${s.name}</button>`).join('');
+const fmt=t=>{t=Math.max(0,t);const m=Math.floor(t/60),s=Math.floor(t%60);return m+':'+String(s).padStart(2,'0')};
+
+let t=0,playing=false,speed=1,last=null,curK=-1;
+function setInfo(k){
+  const s=SEGS[k];
+  $('segTitle').textContent=`${k}｜${s.name}`;
+  $('segSub').textContent=`${fmt(s.start)}–${fmt(s.start+s.dur)}（${s.dur} 秒）`;
+  $('segTags').innerHTML=`<span class="tag"><b>點線面</b>${s.ele}</span><span class="tag"><b>隊形</b>${s.space}</span><span class="tag"><b>Level／Energy／Time</b>${s.let}</span>`;
+  $('segCues').innerHTML=s.cues.map((c,i)=>`<li><span class="dot" style="background:${COLORS[i]}">${i+1}</span><span>${c}</span></li>`).join('');
+  $('segMusic').textContent='音樂：'+s.music;
+  $('wallText').textContent=s.wall;$('wallSub').textContent=s.wallSub;
+  document.querySelectorAll('.band').forEach(b=>b.classList.toggle('on',+b.dataset.k===k));
+  document.querySelectorAll('#segs button').forEach(b=>b.classList.toggle('on',+b.dataset.k===k));
+  refHi(s.ref);$('refText').textContent=s.refText;
+  guide(k);
+}
+function render(){
+  const ps=COLORS.map((_,i)=>poseAt(i,Math.min(t,TOTAL-0.001)));
+  const k=ps[0].k;if(k!==curK){curK=k;setInfo(k)}
+  const order=ps.map((o,i)=>[o.p.z,i]).sort((a,b)=>b[0]-a[0]);
+  order.forEach(([,i])=>{peopleG.appendChild(figs[i].root);drawPerson(figs[i],ps[i].p)});
+  $('time').textContent=`${fmt(t)} / ${fmt(TOTAL)}`;
+  $('headbar').style.left=(t/TOTAL*100)+'%';
+  const s=SEGS[k];let sc=1;
+  if(s.bpm&&playing){const ph=(t-s.start)*s.bpm/60%1;sc=1+.6*Math.max(0,1-ph*4)}
+  $('pulse').style.transform=`scale(${sc})`;$('pulse').style.opacity=s.bpm?1:.25;
+}
+function frame(ts){
+  if(playing){
+    if(hasAudio&&!audio.paused&&!audio.ended&&audio.currentTime>0){t=audio.currentTime;last=ts}
+    else{if(last!=null)t+=(ts-last)/1000*speed;last=ts}
+    if(t>=TOTAL){t=TOTAL;playing=false;updBtn();audioSync()}}
+  render();requestAnimationFrame(frame);
+}
+function updBtn(){$('play').textContent=playing?'❚❚ 暫停':'▶ 播放';last=null}
+$('play').onclick=()=>{if(t>=TOTAL)t=0;playing=!playing;updBtn();audioSync()};
+$('restart').onclick=()=>{t=0;playing=true;updBtn();audioSync()};
+$('speed').onclick=e=>{const b=e.target.closest('button');if(!b)return;speed=+b.dataset.s;
+  document.querySelectorAll('#speed button').forEach(x=>x.classList.toggle('on',x===b));audioSync()};
+$('segs').onclick=e=>{const b=e.target.closest('button');if(!b)return;t=SEGS[+b.dataset.k].start+.01;playing=true;updBtn();audioSync()};
+const tl=$('timeline');
+const seek=e=>{const r=tl.getBoundingClientRect();t=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*TOTAL;last=null;audioSeek()};
+let drag=false;
+tl.addEventListener('pointerdown',e=>{drag=true;tl.setPointerCapture(e.pointerId);seek(e)});
+tl.addEventListener('pointermove',e=>{if(drag)seek(e)});
+tl.addEventListener('pointerup',()=>{drag=false;audioSeek()});
+/* ---------- music ---------- */
+const audio=new Audio();audio.preload='auto';let hasAudio=false,audioUrl=null;
+function audioSeek(){if(hasAudio){try{audio.currentTime=Math.min(t,audio.duration||t)}catch(e){}}}
+function audioSync(){
+  if(!hasAudio)return;
+  audio.playbackRate=speed;
+  if(playing){audioSeek();const pr=audio.play();if(pr&&pr.catch)pr.catch(()=>{})}else audio.pause();
+}
+$('musicFile').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(audioUrl)URL.revokeObjectURL(audioUrl);
+  audioUrl=URL.createObjectURL(f);audio.src=audioUrl;hasAudio=true;
+  $('fname').textContent=f.name;$('musicClear').hidden=false;$('mwarn').hidden=true;
+  playing=false;t=0;updBtn();audio.currentTime=0;
+});
+audio.addEventListener('loadedmetadata',()=>{
+  const d=audio.duration;$('fname').textContent+=`（${fmt(d)}）`;
+  if(Math.abs(d-TOTAL)>3){$('mwarn').hidden=false;
+    $('mwarn').textContent=`提醒：音樂長 ${fmt(d)}，動畫長 ${fmt(TOTAL)}，兩者會從 0:00 一起開始，${d>TOTAL?'動畫結束時音樂會一起停':'音樂會比動畫早結束'}。`}
+});
+audio.addEventListener('ended',()=>{});
+$('musicClear').onclick=()=>{audio.pause();audio.removeAttribute('src');audio.load();hasAudio=false;
+  if(audioUrl)URL.revokeObjectURL(audioUrl);audioUrl=null;$('musicFile').value='';
+  $('fname').textContent='尚未選擇音樂（mp3、m4a、wav 都可以）';$('musicClear').hidden=true;$('mwarn').hidden=true};
+render();requestAnimationFrame(frame);
+</script>
+</body>
+</html>

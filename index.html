@@ -257,6 +257,12 @@ const STAIR=[[480,.3,.55],[580,.5,.75],[680,.75,1]];
 const mono=t=>{const s=sin(2*PI*t/1.5);return 90+55*Math.max(-1,Math.min(1,s*3))};
 const bob=(t,f=1.33)=>.03*Math.abs(sin(2*PI*f*t));
 const OFF=P(1100,.5,.8,20,20,{vis:0});
+/* 配樂中「老大哥的和聲」出現的時間：[開始秒數, 長度]。用頻譜比對估出來的（誤差約 1 秒），聽起來不準可以直接改這裡。
+   和聲響的時候，老大哥身上會發出金色的光、光環變金色 */
+const HARMONY=[[10.5,5.5],[63.2,5.5],[71.4,5.5],[88.3,5.5],[119.3,5.5]];
+function harmonyAt(tt){let k=0;for(const [s0,d] of HARMONY){if(tt<s0-.3||tt>s0+d+.6)continue;
+  k=Math.max(k,Math.min(ease((tt-s0+.3)/.6),1-ease((tt-s0-d)/.6)))}
+  return k?k*(.85+.15*sin(tt*6)):0}
 
 const ROLES=[
  {name:'老大哥',c:'#FFFFFF',feat:'#1d1b18',ol:1,note:'白色＋銀色光環'},
@@ -437,6 +443,7 @@ const figs=ROLES.map((r,i)=>{
   const root=el('g',{},peopleG);
   const shadow=el('ellipse',{rx:22,ry:6,fill:'#000',opacity:.08},root);
   const nameT=el('text',{'text-anchor':'middle','font-size':12,'font-weight':700,fill:'#8a8173'},root);nameT.textContent=r.name;
+  const aura=i===0?el('ellipse',{fill:'#F2C14E',filter:'url(#blur)',opacity:0},root):null; /* 和聲時的光（畫在外框濾鏡外面） */
   const g=el('g',r.ol?{filter:'url(#outline)'}:{},root);
   const glow=el('circle',{r:26,fill:r.c,filter:'url(#blur)',opacity:0},g);
   const parts={legL:el('polyline',{fill:'none','stroke-linecap':'round','stroke-linejoin':'round','stroke-width':8},g),
@@ -450,7 +457,7 @@ const figs=ROLES.map((r,i)=>{
   const badge=el('g',{},badgesG);
   const bRect=el('rect',{y:-11,height:22,rx:7,fill:'#1d1b18'},badge);
   const bText=el('text',{'text-anchor':'middle','font-size':12,'font-weight':700,fill:'#fff','dominant-baseline':'central'},badge);
-  return {root,shadow,nameT,g,glow,...parts,halo,eyeDot,e1,e2,mouth,badge,bRect,bText,lastLabel:null};
+  return {root,shadow,nameT,aura,g,glow,...parts,halo,eyeDot,e1,e2,mouth,badge,bRect,bText,lastLabel:null};
 });
 function drawPerson(i,p){
   const f=figs[i],r=ROLES[i];
@@ -479,6 +486,10 @@ function drawPerson(i,p){
   else if(FROWN.includes(ex))d=`M-6,${hy+8} Q0,${hy+2} 6,${hy+8}`;
   else d=`M-5,${hy+5} L5,${hy+5}`;
   f.mouth.setAttribute('d',d);
+  if(f.aura){const hk=harmonyAt(t);f.aura.setAttribute('opacity',hk*.7);
+    f.aura.setAttribute('transform',`translate(${X},${Y}) scale(${S}) rotate(${p.lean})`);
+    f.aura.setAttribute('cx',0);f.aura.setAttribute('cy',(hy-14)/2);f.aura.setAttribute('rx',38);f.aura.setAttribute('ry',-(hy-14)/2+16);
+    f.halo.setAttribute('stroke',mixHex('#B4B2A9','#E8B730',Math.min(1,hk)));f.halo.setAttribute('stroke-width',3.5+2*hk)}
   if(f.halo){f.halo.setAttribute('cy',hy-20);f.eyeDot.setAttribute('cx',0);f.eyeDot.setAttribute('cy',hy-9)}
   const label=(p.fz>.5?'定・':'')+ex;
   if(label!==f.lastLabel){f.lastLabel=label;f.bText.textContent=label;const w=14+12*[...label].length;f.bRect.setAttribute('x',-w/2);f.bRect.setAttribute('width',w);

@@ -782,7 +782,7 @@ async function downloadPdf(){
       d.querySelectorAll('[data-link]').forEach(a=>{const r=a.getBoundingClientRect();doc.link(r.left-o.left,r.top-o.top,r.width,r.height,{url:SITE_URL})});
     }
     doc.setProperties({title:`${THEME}｜${COURSE}`,subject:SITE_URL});
-    doc.save('dream-and-reality-slides.pdf'); /* 英文檔名：部分瀏覽器會把中文檔名改成 download */
+    doc.save('reaching-beyond-slides.pdf'); /* 英文檔名：部分瀏覽器會把中文檔名改成 download */
   }catch(e){alert('PDF 產生失敗：'+(e&&e.message||e)+'\n請確認網路連線後再試一次。')}
   finally{box.remove();t=saved.t;stopAt=saved.stopAt;playing=saved.playing;updBtn();audioSync();render();
     btns.forEach((b,i)=>b.textContent=labels[i]);pdfBusy=false}

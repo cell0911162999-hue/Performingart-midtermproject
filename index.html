@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>現實，還是夢想？｜115-1 劇場遊戲 期中考</title>
+<title>伸手之外｜115-1 劇場遊戲 期中考</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -17,7 +17,8 @@
   header h1{font-size:20px;font-weight:900;margin:4px 0 2px;letter-spacing:.02em}
   header .course{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:6px}
   header h1.theme{font-size:34px;line-height:1.25;margin:4px 0 4px;letter-spacing:.04em}
-  header .work{font-size:15px;font-weight:700;color:#5b554c;margin-bottom:10px}
+  header .work{font-size:15px;font-weight:700;color:#5b554c}
+  header .tagline{font-size:14px;color:var(--muted);letter-spacing:.12em;margin:2px 0 12px}
   header .team-row{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin:0 0 12px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:12px}
   header .team-row .tl{font-weight:900;color:var(--muted)}
   header .team-row small{color:var(--muted);margin-right:4px;font-size:12px}
@@ -109,6 +110,7 @@
   .s-cover{display:flex;flex-direction:column;justify-content:center;padding-bottom:60px}
   .s-cover h1{font-size:88px;font-weight:900;margin:10px 0 6px;letter-spacing:.04em}
   .s-cover .sub{font-size:28px;font-weight:700;color:#5b554c;margin-bottom:34px}
+  .s-cover .tagl{font-size:24px;color:var(--muted);letter-spacing:.14em;margin:-22px 0 30px}
   .s-cover .meta{font-size:19px;color:var(--muted);margin-top:26px}
   .s-cover .team{margin-top:34px;padding-top:20px;border-top:1px solid var(--line)}
   .s-cover .team .tl{font-size:14px;font-weight:900;color:var(--muted);letter-spacing:.1em;margin-bottom:10px}
@@ -175,8 +177,9 @@
 <div class="wrap">
   <header>
     <div class="course" id="hCourse">115-1 劇場遊戲 期中考</div>
-    <h1 class="theme" id="hTheme">現實，還是夢想？</h1>
-    <div class="work">《夢想與現實》走位動畫</div>
+    <h1 class="theme" id="hTheme">伸手之外</h1>
+    <div class="work" id="hSub">以《1984》為本的舞蹈創作</div>
+    <div class="tagline" id="hTag">「永遠碰不到的夢想」</div>
     <div class="team-row" id="teamRow"></div>
     <p>正面看舞台（觀眾視角）。人越往後越小；身體越矮代表 level 越低。頭上的標籤是表情：灰色＝正在動，黑色「定・」＝定像。</p>
     <div class="deck-btns">
@@ -610,12 +613,14 @@ render();requestAnimationFrame(frame);
 /* ---------- 簡報模式與 PDF ---------- */
 /* 下載版 PDF 附上的網站連結；網站搬到別的網址（例如 GitHub Pages）時改這裡 */
 const SITE_URL='https://cell0911162999-hue.github.io/Performingart-midtermproject/';
-const TITLE='夢想與現實';
 /* 課程、主題、小組成員：網站標題區、簡報封面、每頁頁尾與結尾頁都會用到，改這裡就會一起更新 */
 const COURSE='115-1 劇場遊戲 期中考';
-const THEME='現實，還是夢想？';
+const THEME='伸手之外';
+const SUBTITLE='以《1984》為本的舞蹈創作';
+const TAGLINE='永遠碰不到的夢想';
 const TEAM=[['語創夜碩二','鄧容'],['兒英夜碩三','黃楷媜'],['音四甲','廖書妤'],['音五','梁文競']];
-$('hCourse').textContent=COURSE;$('hTheme').textContent=THEME;
+$('hCourse').textContent=COURSE;$('hTheme').textContent=THEME;$('hSub').textContent=SUBTITLE;$('hTag').textContent=`「${TAGLINE}」`;
+document.title=`${THEME}｜${COURSE}`;
 $('teamRow').innerHTML=`<span class="tl">小組成員</span>`+TEAM.map(([c,n])=>`<span><small>${c}</small><b>${n}</b></span>`).join('');
 const LIBS={
   h2c:'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
@@ -676,7 +681,7 @@ const chips=()=>`<div class="s-chips">${ROLES.map(r=>`<span class="s-chip"><i st
 function buildSlides(pdf){
   const out=[];
   const add=(cls,html)=>{const d=document.createElement('div');d.className='slide '+cls;d.innerHTML=html;out.push(d);return d};
-  add('s-cover',`<div class="kick">${COURSE}</div><h1>${THEME}</h1><div class="sub">《${TITLE}》舞蹈創作・走位動畫</div>
+  add('s-cover',`<div class="kick">${COURSE}</div><h1>${THEME}</h1><div class="sub">${SUBTITLE}</div><div class="tagl">「${TAGLINE}」</div>
     ${chips()}<div class="meta">全長 ${fmt(TOTAL)} ・ ${SEGS.length} 個段落 ・ ${ROLES.length} 位角色</div>
     <div class="team"><div class="tl">小組成員</div><div class="tm">${TEAM.map(([c,n])=>`<div class="p"><small>${c}</small><b>${n}</b></div>`).join('')}</div></div>`);
   const lead=`<p class="lead">${document.querySelector('.concept .lead').innerHTML}</p>`,idea=`<ul>${document.querySelector('.concept .idea').innerHTML}</ul>`;
@@ -699,7 +704,7 @@ function buildSlides(pdf){
         <div><span class="k">做法</span>${c.idea}</div><div><span class="k">提點</span>${c.hits.join('　')}</div></div></div></div>`);
     d.dataset.seg=k;const cp=conceptPart(s.ref);if(cp)d.appendChild(cp);
   });
-  add('s-end',`<div class="kick">${COURSE}｜${THEME}</div><h2>謝謝觀看</h2><div class="lk">線上互動版（可播放動畫、配樂、拖曳時間軸）</div>
+  add('s-end',`<div class="kick">${COURSE}｜${THEME}・${TAGLINE}</div><h2>謝謝觀看</h2><div class="lk">線上互動版（可播放動畫、配樂、拖曳時間軸）</div>
     <a class="url" href="${SITE_URL}" target="_blank" rel="noopener" data-link>${SITE_URL}</a>${qrMarkup()?`<div class="qr" data-link>${qrMarkup()}</div>`:''}
     <div class="eteam">小組成員　${TEAM.map(([c,n])=>`${c} <b>${n}</b>`).join('　・　')}</div>`);
   out.forEach((d,i)=>d.insertAdjacentHTML('beforeend',`<div class="s-foot"><span>${COURSE}｜${THEME}</span><span class="sp"></span>${pdf?`<a href="${SITE_URL}" data-link>網站：${SITE_URL}</a>`:''}<span>${i+1} / ${out.length}</span></div>`));

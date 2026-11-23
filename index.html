@@ -481,7 +481,7 @@ function audioSync(){
   if(playing){audioSeek();const pr=audio.play();if(pr&&pr.catch)pr.catch(()=>{})}else audio.pause();
 }
 /* 預設配樂：和 index.html 放在同一個資料夾。找不到檔案時，就跟原本一樣等使用者自己上傳。 */
-const DEFAULT_MUSIC='music.mp3';
+const DEFAULT_MUSIC='music.mp4';
 const NO_MUSIC='尚未選擇音樂（mp3、m4a、wav 都可以）';
 let usingDefault=false,defaultOk=false,defaultUrl=null;
 async function loadDefault(){

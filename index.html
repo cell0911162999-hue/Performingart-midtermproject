@@ -257,6 +257,12 @@ const STAIR=[[480,.3,.55],[580,.5,.75],[680,.75,1]];
 const mono=t=>{const s=sin(2*PI*t/1.5);return 90+55*Math.max(-1,Math.min(1,s*3))};
 const bob=(t,f=1.33)=>.03*Math.abs(sin(2*PI*f*t));
 const OFF=P(1100,.5,.8,20,20,{vis:0});
+/* 配樂中「老大哥的和聲」出現的時間：[開始秒數, 長度]。用頻譜比對估出來的（誤差約 1 秒），聽起來不準可以直接改這裡。
+   和聲響的時候，老大哥身上會發出金色的光、光環變金色 */
+const HARMONY=[[10.5,5.5],[63.2,5.5],[71.4,5.5],[88.3,5.5],[119.3,5.5]];
+function harmonyAt(tt){let k=0;for(const [s0,d] of HARMONY){if(tt<s0-.3||tt>s0+d+.6)continue;
+  k=Math.max(k,Math.min(ease((tt-s0+.3)/.6),1-ease((tt-s0-d)/.6)))}
+  return k?k*(.85+.15*sin(tt*6)):0}
 
 const ROLES=[
  {name:'老大哥',c:'#FFFFFF',feat:'#1d1b18',ol:1,note:'白色＋銀色光環'},
@@ -265,21 +271,21 @@ const ROLES=[
  {name:'夢想',c:'#E24B4A',feat:'#ffffff',note:'紅色'}];
 
 const SEGS=[
- {name:'01 序幕',dur:18,wall:'點・線',wallSub:'老大哥與麻木的人',ele:'老大哥是台前的一個點；兩人走在同一條直線上',lvl:'老大哥高位；兩人中位',ref:[],
-  cues:['走到台前，帶著慈父般的微笑面對群眾；高位，穩穩站著','在後方和順從者整齊劃一地走路出場；中位，麻木、沒有表情','同夢想者，兩人步伐完全同步','還沒出場'],
-  comp:{mood:'冷漠、壓迫、麻木；老大哥的微笑是假的溫柔',dyn:'mp，從頭到尾不變',tempo:'約 80 BPM，像時鐘或機器的行進節拍',idea:'機械式節拍（可用 AI 生成）；老大哥出場時可加一層低沉長音',hits:['0:00 老大哥出場','0:06 老大哥站定台前','0:14 兩人走到定點，原地踏步']}},
- {name:'02 掌聲',dur:6,wall:'點',wallSub:'麻木的掌聲',ele:'每一下掌聲是一個點',lvl:'兩人中位',ref:[],
-  cues:['轉身離開','麻木地拍拍手，拍完定像','同夢想者，拍子完全一樣','還沒出場'],
+ {name:'01 序幕',dur:18,wall:'點・線',wallSub:'老大哥與麻木的人',ele:'老大哥是台前的一個點；順從者走在一條直線上',lvl:'老大哥高位；順從者中位',ref:[],
+  cues:['走到台前，帶著慈父般的微笑面對群眾；高位，穩穩站著','還沒出場（0:28 才進場）','在後方整齊劃一地走路出場，像機器一樣；中位，麻木、沒有表情','還沒出場'],
+  comp:{mood:'冷漠、壓迫、麻木；老大哥的微笑是假的溫柔',dyn:'mp，從頭到尾不變',tempo:'約 80 BPM，像時鐘或機器的行進節拍',idea:'機械式節拍（可用 AI 生成）；老大哥出場時可加一層低沉長音',hits:['0:00 老大哥出場','0:06 老大哥站定台前','0:14 順從者走到定點，原地踏步']}},
+ {name:'02 掌聲',dur:6,wall:'點',wallSub:'麻木的掌聲',ele:'每一下掌聲是一個點',lvl:'順從者中位',ref:[],
+  cues:['轉身離開','還沒出場','對著老大哥離開的方向麻木地拍拍手，拍完定像','還沒出場'],
   comp:{mood:'空洞、服從，拍手不是因為開心',dyn:'音樂停，只留掌聲',tempo:'掌聲約每秒 2 下，整齊但沒有力氣',idea:'不要配樂，讓現場掌聲成為聲音',hits:['0:18 老大哥轉身離開','0:20 開始拍手','0:23 停止、定像']}},
- {name:'03 分化',dur:12,wall:'面',wallSub:'兩個一樣的區塊',ele:'一條線分成兩個區塊（面），動作鏡像',lvl:'兩人中位，速度固定不變',ref:[],
-  cues:['（已離場）','走到右邊區塊，和順從者跳一模一樣的舞；麻木','走到左邊區塊，跳一樣的舞；麻木','還沒出場'],
-  comp:{mood:'單調、無聊、重複，沒有任何情緒',dyn:'mp，不變',tempo:'約 80 BPM，同 01 的機械節拍',idea:'直接重複 01 的節拍，讓觀眾聽出「一模一樣」',hits:['0:24 兩人分開','0:27 開始一模一樣的舞']}},
- {name:'04-1 夢想出現',dur:16,wall:'圓＋線',wallSub:'圈圈上階梯',ele:'圈圈上階梯：被夢想用隱形的線牽著繞圈，一階一階往上',lvl:'夢想者低→中→高',ref:['circles','steps'],
-  cues:['（已離場）','被夢想影響，脫掉灰色外套變成橘色；快樂地跳舞，一階一階往上，最後高位定像','左邊區塊定像；麻木','第一次出場，繞著夢想者跳，用隱形的線牽著他往上；自由、輕快'],
-  comp:{mood:'驚喜→喜悅→自由，越來越開心',dyn:'mp→f 漸強',tempo:'約 100 BPM，輕快搖擺',idea:'全曲第一次出現明亮的旋律；上階梯時音階一路往上爬',hits:['0:36 夢想出現，音色變明亮','0:39 夢想者脫外套變紅','0:49 停在最高點定像']}},
- {name:'04-2 推開夢想',dur:12,wall:'蹺蹺板',wallSub:'猶豫，然後推開',ele:'蹺蹺板：順從者在夢想與現實之間搖擺，隱形的線剛拉起就被推斷',lvl:'順從者中位；推開那一下 energy 最強',ref:['seesaw'],
-  cues:['（已離場）','高位定像；快樂','和夢想短暫共舞，心動、猶豫，像蹺蹺板搖擺，最後用力推開夢想','走到順從者身邊共舞，被推開後倒在左邊低位定像'],
-  comp:{mood:'好奇、心動→猶豫→排斥',dyn:'mp；推開那一下 ff 重音',tempo:'猶豫時節奏不穩、搖擺',idea:'明亮旋律短暫出現；推開時一聲重音（可用 AI 音效）後切斷',hits:['0:55 順從者開始和夢想共舞','0:58 猶豫搖擺','1:00 推開＝重音後切斷']}},
+ {name:'03 分化',dur:12,wall:'面',wallSub:'兩個一樣的區塊',ele:'順從者先佔住左邊的區塊（面）；夢想者進場走進右邊區塊，兩個區塊動作鏡像、一模一樣',lvl:'兩人中位，速度固定不變',ref:[],
+  cues:['（已離場）','0:28 隨著自己的進場音樂，從右邊側台走上來，走進右邊區塊；0:31 起跟順從者跳一模一樣的舞；麻木','走到左邊區塊，跳單調重複的舞；麻木','還沒出場'],
+  comp:{mood:'單調、無聊、重複，沒有任何情緒',dyn:'mp，不變',tempo:'約 80 BPM，同 01 的機械節拍',idea:'直接重複 01 的節拍，讓觀眾聽出「一模一樣」',hits:['0:24 順從者走到左邊區塊','0:28 夢想者的進場音樂，夢想者進場','0:31 兩人開始一模一樣的舞','0:35 順從者的音樂響起']}},
+ {name:'04-1 夢想出現',dur:19,wall:'圓＋線',wallSub:'圈圈上階梯',ele:'圈圈上階梯：被夢想用隱形的線牽著繞圈，一階一階往上',lvl:'夢想者低→中→高',ref:['circles','steps'],
+  cues:['（已離場）','0:41 前還在跟順從者跳一樣的舞；夢想出現後被影響，脫掉灰色外套變成橘色，和夢想跳雙人舞，一階一階往上，最後在最高處定像；快樂','自己的音樂（0:35–0:41）響著，繼續照節拍跳一樣的舞，完全不受夢想影響；音樂結束才定像；麻木','0:41 隨著自己的音樂第一次出場，和夢想者跳雙人舞，繞著他、用隱形的線牽著他往上；自由、輕快'],
+  comp:{mood:'驚喜→喜悅→自由，越來越開心',dyn:'mp→f 漸強',tempo:'約 100 BPM，輕快搖擺',idea:'全曲第一次出現明亮的旋律；上階梯時音階一路往上爬',hits:['0:41 順從者的音樂結束、定像；夢想的音樂響起，夢想出場','0:44 夢想者脫外套變橘色，雙人舞開始','0:54 夢想者爬到最高點定像','0:55 雙人舞音樂結束']}},
+ {name:'04-2 推開夢想',dur:9,wall:'蹺蹺板',wallSub:'猶豫，然後推開',ele:'蹺蹺板：順從者在夢想與現實之間搖擺，隱形的線剛拉起就被推斷',lvl:'順從者中位；推開那一下 energy 最強',ref:['seesaw'],
+  cues:['（已離場）','高位定像；快樂','和夢想短暫共舞，心動、猶豫，像蹺蹺板搖擺，最後用力推開夢想','雙人舞結束後走到順從者身邊共舞，被推開後倒在左邊低位定像'],
+  comp:{mood:'好奇、心動→猶豫→排斥',dyn:'mp；推開那一下 ff 重音',tempo:'猶豫時節奏不穩、搖擺',idea:'明亮旋律短暫出現；推開時一聲重音（可用 AI 音效）後切斷',hits:['0:57 順從者開始和夢想共舞','0:58.5 猶豫搖擺','1:00 推開＝重音後切斷']}},
  {name:'04-3 回到日常',dur:13,wall:'線',wallSub:'直線來回的日常',ele:'直線來回、重複 03 的動作，跟夢想的曲線對比',lvl:'兩人中位，速度固定不變',ref:[],
   cues:['回來，和順從者跳跟日常一樣的舞；慈父般的微笑','跟老大哥跳一樣的舞，單調、沒有激情；麻木','高位定像；快樂','左邊低位定像；受傷'],
   comp:{mood:'回到麻木、安全、沒有激情',dyn:'mp，不變',tempo:'約 80 BPM，和 01 完全一樣',idea:'直接用回 01 的機械節拍',hits:['1:04 老大哥回來','1:07 兩人開始一樣的舞']}},
@@ -290,11 +296,11 @@ const SEGS=[
   cues:['大步介入夢想者與夢想之間，張開雙臂切斷兩人的連結，把夢想推開；定像','正和夢想伸手相連，連結被切斷的瞬間往後一震，動作突然停止；震驚','左邊定像；麻木','被老大哥推開，跌坐在右邊低位；無力'],
   comp:{mood:'最後一次重大衝突：驚恐、斷裂',dyn:'最強的重音，之後突然收掉',tempo:'對準 1:30 音樂最強烈的變化',idea:'老大哥介入那一下對準音樂的重音，之後留下長音或殘響',hits:['1:30 老大哥介入、切斷連結','1:31 夢想者震驚定住','1:32 夢想被推倒在地']}},
  {name:'05-2 衝突後的空白',dur:20,noBlend:1,wall:'空白',wallSub:'壓迫與停滯',ele:'大片留白；只有緩慢、克制的移動，所有人走向群像的預備位置（地上的色圈）',lvl:'夢想者由中位慢慢沉到低位；其他人中位',ref:['curves'],
-  cues:['放下手臂，慢慢走到舞台正中央，像在接管整個空間','震驚、無助，踉蹌地往左前方退，越退越低，最後縮在左前方','從定像中慢慢鬆開，轉向舞台中央，等待','慢慢撐起身體，無力地移到老大哥右側'],
-  comp:{mood:'壓迫、停滯、無助',dyn:'p，幾乎靜止',tempo:'沒有明顯拍點，時間像被拉長',idea:'衝突後的殘響或長音，留出空白讓觀眾感受停滯',hits:['1:42 夢想者開始後退','1:44 老大哥走向中央','1:56 所有人到達預備位置']}},
+  cues:['放下手臂，慢慢走到舞台正中央，像在接管整個空間','震驚定住；1:45「失去夢想的痛苦」響起，才踉蹌地往左前方退，越退越低，音樂結束時縮在左前方；1:56 起「哭泣的夢想者」響起，縮成一團抱膝哭泣','從定像中慢慢鬆開，轉向舞台中央，等待','慢慢撐起身體，無力地移到老大哥右側'],
+  comp:{mood:'壓迫、停滯、無助',dyn:'p，幾乎靜止',tempo:'沒有明顯拍點，時間像被拉長',idea:'衝突後的殘響或長音，留出空白讓觀眾感受停滯',hits:['1:44 老大哥走向中央','1:45 「失去夢想的痛苦」響起，夢想者開始後退','1:56 其他人到達預備位置','1:56 「哭泣的夢想者」響起','1:58 夢想者縮在左前方，抱膝哭泣']}},
  {name:'05-3 四人群像',dur:32,noBlend:1,wall:'群像',wallSub:'權力・服從・壓迫・渴望',ele:'四人依序加入、一個接一個定像；高度由高到低，方向各自互補，組成一幅畫',lvl:'老大哥最高（站）→ 順從者中（高跪）→ 夢想者中低（伸展）→ 夢想最低（跪伏）',ref:['circles','steps'],
-  cues:['2:00–2:08 在正中央挺直站到最高，面向觀眾；左手高舉在順從者上方，右手斜壓向夢想，身體擋在夢想者與夢想之間；定像','2:24–2:32 最後加入：從左前方撐起，身體向右朝夢想延伸、伸手，手停在老大哥的腿前，被他的身體隔開，碰不到；定像','2:08–2:16 走到老大哥左側緊貼著高跪，身體和臉朝向老大哥，雙手向上；崇拜、服從，定像','2:16–2:24 在老大哥右側慢慢跪下，身體向舞台外側倒，頭越來越低、臉朝地板；定像'],
-  comp:{mood:'一層一層疊上去的壓迫，最後凝結成一幅畫',dyn:'隨加入的人數一層一層加厚',tempo:'每 8 秒一位，四個清楚的段落',idea:'每位角色開始動作時對準一個樂句的開頭，定像時落在樂句結尾',hits:['2:00 老大哥','2:08 順從者','2:16 夢想','2:24 夢想者','2:32 群像完成']}},
+  cues:['2:00–2:08 在正中央挺直站到最高，面向觀眾；左手高舉在順從者上方，右手斜壓向夢想，身體擋在夢想者與夢想之間；定像','2:00–2:14 縮在左前方抱膝哭泣；2:24–2:32 最後加入：從左前方撐起，身體向右朝夢想延伸、伸手，手停在老大哥的腿前，被他的身體隔開，碰不到；定像','2:08–2:16 走到老大哥左側緊貼著高跪，身體和臉朝向老大哥，雙手向上；崇拜、服從，定像','2:16–2:24 在老大哥右側慢慢跪下，身體向舞台外側倒，頭越來越低、臉朝地板；定像'],
+  comp:{mood:'一層一層疊上去的壓迫，最後凝結成一幅畫',dyn:'隨加入的人數一層一層加厚',tempo:'每 8 秒一位，四個清楚的段落',idea:'每位角色開始動作時對準一個樂句的開頭，定像時落在樂句結尾',hits:['2:00 老大哥','2:08 順從者','2:14 「哭泣的夢想者」結束','2:16 夢想','2:24 夢想者','2:32 群像完成']}},
  {name:'05-4 反序退場',dur:6,noBlend:1,wall:'拆解',wallSub:'反序退場',ele:'群像一塊一塊拆掉：最後定像的人最先離開',lvl:'離場時站起、回到中位',ref:['curves'],
   cues:['2:36.5 最後一個離場，從右邊走出','2:32 第一個離場，往左邊走出','2:35 第三個離場，往左邊走出','2:33.5 第二個離場，往右邊走出'],
   comp:{mood:'安靜地拆解，回到空無',dyn:'漸弱',tempo:'每 1.5 秒一位',idea:'還沒輪到的人維持定像，一次只有一個人動',hits:['2:32 夢想者','2:33.5 夢想','2:35 順從者','2:36.5 老大哥']}},
@@ -312,40 +318,58 @@ const Y_DOWN=P(60,.7,.45,40,120,{lean:-18,fz:1,ex:'受傷'});
 SEGS[0].pose=[
  t=>seq(t,[[6,t=>{const u=ease(t/6);return P(lerp(900,400,u),lerp(.6,.08,u),1+bob(t,.8),30,30,{vis:Math.min(1,t*1.5),ex:'慈父微笑'})}],
   [99,t=>P(400,.08,1,lerp(30,60,ease(t-6)),lerp(30,60,ease(t-6)),{ex:'慈父微笑'})]]),
- t=>{const x=Math.min(-300+64.3*t,600);return P(x,.8,.8+bob(t),30+20*sin(2*PI*.67*t),30-20*sin(2*PI*.67*t),{ex:'麻木'})},
+ t=>OFF, /* 夢想者 0:28 才進場 */
  t=>{const x=Math.min(-400+64.3*t,500);return P(x,.8,.8+bob(t),30+20*sin(2*PI*.67*t),30-20*sin(2*PI*.67*t),{ex:'麻木'})},
  t=>OFF];
 SEGS[1].pose=[
  t=>{const u=ease(t/3);return P(lerp(400,1100,u),lerp(.08,.5,u),1+bob(t,.8),30,30,{vis:1-ease((t-2)/1),ex:'慈父微笑'})},
- t=>{const a=t>2&&t<5?40+50*Math.abs(sin(2*PI*(t-2))):40;return P(600,.8,.8,a,a,{fz:t>5?1:0,ex:'麻木'})},
+ t=>OFF,
  t=>{const a=t>2&&t<5?40+50*Math.abs(sin(2*PI*(t-2))):40;return P(500,.8,.8,a,a,{fz:t>5?1:0,ex:'麻木'})},
  t=>OFF];
 SEGS[2].pose=[
  t=>OFF,
- t=>{const u=ease(t/3);const a=t>3?mono(t-3):40;return P(lerp(600,560,u)+(t>3?15*sin(2*PI*(t-3)/3):0),lerp(.8,.45,u),.78+(u<1?bob(t):0),a,a,{ex:'麻木'})},
+ t=>{ /* 夢想者：0:28（本段第 4 秒）隨進場音樂從右側台走進右邊區塊，0:31.5 起和順從者跳鏡像的同一支舞 */
+   const IN=4,ARR=7.5;
+   const walk=tt=>{const u=ease((tt-IN)/(ARR-IN));return P(lerp(1000,560,u),.45,.78+bob(tt),30+20*sin(2*PI*.67*tt),30-20*sin(2*PI*.67*tt),{vis:Math.min(1,(tt-IN)*2),ex:'麻木'})};
+   const dance=tt=>{const a=mono(tt-3);return P(560+15*sin(2*PI*(tt-3)/3),.45,.78,a,a,{ex:'麻木'})};
+   if(t<IN)return P(1000,.45,.78,30,30,{vis:0,ex:'麻木'});
+   if(t<ARR)return walk(t);
+   if(t<ARR+.8)return mix(walk(ARR),dance(t),ease((t-ARR)/.8));
+   return dance(t)},
  t=>{const u=ease(t/3);const a=t>3?mono(t-3):40;return P(lerp(500,240,u)-(t>3?15*sin(2*PI*(t-3)/3):0),lerp(.8,.45,u),.78+(u<1?bob(t):0),a,a,{ex:'麻木'})},
  t=>OFF];
+/* 04-1：0:41 夢想隨自己的音樂出場（本段第 5 秒），0:41–0:55 是夢想與夢想者的雙人舞 */
+const IN41=5;
+const D41=t=>{const [x,z,h]=dPath41(t);const c=ease((t-3)/2);const ex=t<3?'麻木':t<4.5?'驚訝':'快樂';  /* t＝夢想出場後的秒數 */
+   if(t>=13)return mix(P(x,z,h,110+40*sin(13*4),110-40*sin(13*4),{c:1,ex:'快樂',turn:3}),D_TOP,ease((t-13)/.8));
+   const j=t>3?1:0;return P(x,z,h+j*.05*Math.abs(sin(t*3)),j?110+40*sin(t*4):40,j?110-40*sin(t*4):40,{c,ex,turn:t>3?3*ease((t-3)/10):0})};
+const Y41=t=>{if(t<3){const u=ease(t/3);return P(lerp(1100,640,u),lerp(.6,.45,u),.9+.1*Math.abs(sin(t*4)),150,60,{vis:Math.min(1,t*2),glow:.6,ex:'自由'})}
+   const [x,z]=dPath41(t);const th=2*PI*(t-3)/3.3;
+   return P(x+70*cos(th),z+.12*sin(th),.95,150+15*sin(t*3),60+30*sin(t*3),{glow:.6,turn:(t-3)/1.6,ex:'自由'})};
+const mirror03=(tt,side)=>{const a=mono(tt-3);return P((side>0?560:240)+side*15*sin(2*PI*(tt-3)/3),.45,.78,a,a,{ex:'麻木'})}; /* 03 分化的鏡像舞，tt＝03 段內秒數 */
+const Y_TO_R=P(560,.55,.9,150,60,{glow:.5,ex:'自由'});
 SEGS[3].pose=[
  t=>OFF,
- t=>{const [x,z,h]=dPath41(t);const c=ease((t-3)/2);const ex=t<3?'麻木':t<4.5?'驚訝':'快樂';
-   if(t>=13)return mix(P(x,z,h,110+40*sin(13*4),110-40*sin(13*4),{c:1,ex:'快樂',turn:3}),D_TOP,ease((t-13)/.8));
-   const j=t>3?1:0;return P(x,z,h+j*.05*Math.abs(sin(t*3)),j?110+40*sin(t*4):40,j?110-40*sin(t*4):40,{c,ex,turn:t>3?3*ease((t-3)/10):0})},
- t=>R_FZ,
- t=>{if(t<3){const u=ease(t/3);return P(lerp(1100,640,u),lerp(.6,.45,u),.9+.1*Math.abs(sin(t*4)),150,60,{vis:Math.min(1,t*2),glow:.6,ex:'自由'})}
-   const [x,z]=dPath41(t);const th=2*PI*(t-3)/3.3;
-   const orb=P(x+70*cos(th),z+.12*sin(th),.95,150+15*sin(t*3),60+30*sin(t*3),{glow:.6,turn:(t-3)/1.6,ex:'自由'});
-   if(t<13)return orb;return mix(orb,P(750,.8,.9,165,70,{fz:1,glow:.5,ex:'自由'}),ease((t-13)/1))}];
-SEGS[4].pose=[
+ t=>{ /* 夢想者：夢想出場前還在跳 03 的鏡像舞 */
+   if(t<IN41)return mirror03(t+12,1);
+   if(t<IN41+.8)return mix(mirror03(t+12,1),D41(t-IN41),ease((t-IN41)/.8));
+   return D41(t-IN41)},
+ t=>{ /* 順從者：0:35 他的音樂響起，繼續照節拍跳同一支舞、不受夢想影響；0:41 音樂結束才定像 */
+   if(t<5)return mirror03(t+12,-1);if(t<6)return mix(mirror03(17,-1),R_FZ,ease(t-5));return R_FZ},
+ t=>{ /* 夢想：0:41 出場，繞著夢想者跳雙人舞；0:54 音樂快結束時離開，走向順從者 */
+   if(t<IN41)return P(1100,.6,.9,150,60,{vis:0,glow:.6,ex:'自由'});
+   const y=Y41(t-IN41);if(t<18)return y;return mix(y,Y_TO_R,ease(t-18))}];
+SEGS[4].pose=[ /* 04-2（0:55–1:04）：夢想到順從者身邊，1:00 被推開 */
  t=>OFF,
  t=>D_TOP,
- t=>seq(t,[[3,t=>R_FZ],
-   [6,t=>P(240,.45,.8,70+30*sin(t*2),70-30*sin(t*2),{ex:'心動'})],
-   [8.5,t=>{const s=sin(2*PI*(t-6)/1.2);return P(240,.45,.78+.12*s,90+30*s,90-30*s,{lean:15*s,ex:'猶豫'})}],
-   [10,t=>P(240,.45,.85,95,40,{lean:-12,ex:'推開'})],
-   [99,t=>P(240,.45,.78,40,40,{fz:t>10.5?1:0,ex:'麻木'})]],.5),
- t=>seq(t,[[3,t=>{const u=ease(t/3);return P(lerp(750,175,u),lerp(.8,.45,u),.9,150,60,{glow:.5,ex:'自由'})}],
-   [8.5,t=>P(175+12*sin(t*2),.45,.9+.04*sin(t*3),130+20*sin(t*2),90,{glow:.5,ex:'自由'})],
-   [10,t=>{const u=ease((t-8.5)/1.5);return P(lerp(175,60,u),lerp(.45,.7,u),lerp(.9,.45,u),60,140,{lean:-18*u,glow:.3,ex:'受傷'})}],
+ t=>seq(t,[[2,t=>R_FZ],
+   [3.5,t=>P(240,.45,.8,70+30*sin(t*2),70-30*sin(t*2),{ex:'心動'})],
+   [5,t=>{const s=sin(2*PI*(t-3.5)/1.2);return P(240,.45,.78+.12*s,90+30*s,90-30*s,{lean:15*s,ex:'猶豫'})}],
+   [6.5,t=>P(240,.45,.85,95,40,{lean:-12,ex:'推開'})],
+   [99,t=>P(240,.45,.78,40,40,{fz:t>7?1:0,ex:'麻木'})]],.5),
+ t=>seq(t,[[2.5,t=>{const u=ease(t/2.5);return P(lerp(Y_TO_R.x,175,u),lerp(Y_TO_R.z,.45,u),.9,150,60,{glow:.5,ex:'自由'})}],
+   [5,t=>P(175+12*sin(t*2),.45,.9+.04*sin(t*3),130+20*sin(t*2),90,{glow:.5,ex:'自由'})],
+   [6.5,t=>{const u=ease((t-5)/1.5);return P(lerp(175,60,u),lerp(.45,.7,u),lerp(.9,.45,u),60,140,{lean:-18*u,glow:.3,ex:'受傷'})}],
    [99,t=>Y_DOWN]],.4)];
 SEGS[5].pose=[
  t=>seq(t,[[3,t=>{const u=ease(t/3);return P(lerp(1100,330,u),lerp(.5,.45,u),1+bob(t,.8),30,30,{vis:Math.min(1,t*2),ex:'慈父微笑'})}],
@@ -375,7 +399,12 @@ const Y_FALL=P(740,.55,.45,60,20,{lean:25,glow:.2,ex:'無力'});
 const BB_PRE=P(400,.5,.95,25,25,{ex:'慈父微笑'});
 const R_PRE=P(290,.55,.78,40,40,{turn:.08,ex:'麻木'});
 const Y_PRE=P(550,.5,.72,30,30,{lean:10,glow:.25,ex:'無力'});
-const D_PRE=P(180,.2,.5,25,30,{lean:-6,c:1,ex:'無助'});
+const D_PRE=P(180,.2,.5,25,30,{lean:-6,c:1,ex:'痛苦'});
+/* 「哭泣的夢想者」（約 1:56–2:14）：縮在左前方雙手掩面哭泣，肩膀顫抖。T＝整支動畫的秒數 */
+const D_CRY=P(180,.2,.42,-25,-25,{lean:6,c:1,ex:'哭泣'}); /* 縮成一團、雙手抱膝，眼淚往下滴 */
+const CRY_END=134;
+function cryAt(T){const k=Math.min(1,Math.max(0,(T-117.6)/1),Math.max(0,(CRY_END+1-T)/1));if(k<=0)return D_PRE;
+  const p=mix(D_PRE,D_CRY,ease(k));p.lean+=3*sin(T*9)*k;p.h+=.015*sin(T*11)*k;if(k<1)p.ex=k>.5?'哭泣':'痛苦';return p}
 /* 05-3 群像最終定像：四人緊靠成一組。
    老大哥居中最高；順從者緊貼他左側高跪、仰頭向他伸手；夢想貼在他右側跪伏、向外向下；
    夢想者從左前方低位探身伸手，手停在老大哥的腿前——老大哥的身體就是阻隔 */
@@ -402,12 +431,15 @@ SEGS[7].pose=[
  t=>kf(t,[[0,Y_LINK],[.9,Y_LINK],[2.6,P(745,.55,.5,60,20,{lean:25,glow:.25,ex:'被推開'})],[3.2,Y_FALL]])];
 SEGS[8].pose=[
  t=>{const p=kf(t,[[0,BB_CUT],[2,BB_CUT],[4,P(650,.6,.97,25,25,{ex:'慈父微笑'})],[16,BB_PRE]]);if(t>4&&t<16)p.h+=.6*bob(t,.6);return p},
- t=>{const p=kf(t,[[0,D_SHOCK],[2,D_SHOCK],[9,P(380,.3,.65,30,40,{lean:-10,c:1,ex:'無助'})],[17,D_PRE]]);if(t>2&&t<17)p.lean+=4*sin(t*1.3)*Math.min(1,(17-t)/2);return p},
+ t=>{ /* 夢想者：震驚定住到 1:44.8；「失去夢想的痛苦」（1:44.8–1:57.6）響起時才踉蹌後退，音樂結束時縮到左前方 */
+   const A=4.8,B=17.6;
+   const p=kf(t,[[0,D_SHOCK],[A,D_SHOCK],[11,P(380,.3,.62,20,35,{lean:-12,c:1,ex:'痛苦'})],[B,D_PRE]]);
+   if(t>A&&t<B)p.lean+=5*sin((t-A)*1.4)*Math.min(1,(B-t)/2,(t-A)/1);if(t>=B)return cryAt(100+t);return p},
  t=>kf(t,[[0,R_FZ],[6,R_FZ],[14,R_PRE]]),
  t=>kf(t,[[0,Y_FALL],[5,Y_FALL],[10,P(700,.5,.65,40,30,{lean:15,glow:.2,ex:'無力'})],[16,Y_PRE]])];
 SEGS[9].pose=[
  t=>kf(t,[[0,BB_PRE],[6,BB_FIN]]),
- t=>kf(t,[[0,D_PRE],[24,D_PRE],[26.5,P(230,.2,.75,40,70,{lean:5,c:1,ex:'渴望'})],[31,D_FIN]]),
+ t=>t<15?cryAt(120+t):kf(t,[[0,D_PRE],[24,D_PRE],[26.5,P(230,.2,.75,40,70,{lean:5,c:1,ex:'渴望'})],[31,D_FIN]]),
  t=>kf(t,[[0,R_PRE],[8,R_PRE],[14,R_FIN]]),
  t=>kf(t,[[0,Y_PRE],[16,Y_PRE],[23,Y_FIN]])];
 SEGS[10].pose=[
@@ -432,11 +464,12 @@ const mixHex=(a,b,k)=>{const A=hex2(a),B=hex2(b);return '#'+A.map((v,i)=>Math.ro
 const NS='http://www.w3.org/2000/svg';
 const el=(tag,attrs,parent)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent&&parent.appendChild(e);return e};
 const peopleG=document.getElementById('people'),badgesG=document.getElementById('badges'); /* 表情標籤畫在最上層，不會被別的角色擋住 */
-const SMILE=['慈父微笑','快樂','自由','心動','希望','掌控','崇拜'],OPEN=['驚訝','震驚','被推開','推開','渴望'],FROWN=['痛苦','絕望','受傷','掙扎','無力','無助'];
+const SMILE=['慈父微笑','快樂','自由','心動','希望','掌控','崇拜'],OPEN=['驚訝','震驚','被推開','推開','渴望'],FROWN=['哭泣','痛苦','絕望','受傷','掙扎','無力','無助'];
 const figs=ROLES.map((r,i)=>{
   const root=el('g',{},peopleG);
   const shadow=el('ellipse',{rx:22,ry:6,fill:'#000',opacity:.08},root);
   const nameT=el('text',{'text-anchor':'middle','font-size':12,'font-weight':700,fill:'#8a8173'},root);nameT.textContent=r.name;
+  const aura=i===0?el('ellipse',{fill:'#F2C14E',filter:'url(#blur)',opacity:0},root):null; /* 和聲時的光（畫在外框濾鏡外面） */
   const g=el('g',r.ol?{filter:'url(#outline)'}:{},root);
   const glow=el('circle',{r:26,fill:r.c,filter:'url(#blur)',opacity:0},g);
   const parts={legL:el('polyline',{fill:'none','stroke-linecap':'round','stroke-linejoin':'round','stroke-width':8},g),
@@ -447,10 +480,11 @@ const figs=ROLES.map((r,i)=>{
   const eyeDot=i===0?el('circle',{r:2.2,fill:'#E24B4A'},g):null;
   const e1=el('circle',{r:1.9,fill:r.feat},g),e2=el('circle',{r:1.9,fill:r.feat},g);
   const mouth=el('path',{fill:'none',stroke:r.feat,'stroke-width':1.8,'stroke-linecap':'round'},g);
+  const tears=[el('ellipse',{rx:1.6,ry:2.4,fill:'#5AA9E6'},g),el('ellipse',{rx:1.6,ry:2.4,fill:'#5AA9E6'},g)]; /* 「哭泣」時的眼淚 */
   const badge=el('g',{},badgesG);
   const bRect=el('rect',{y:-11,height:22,rx:7,fill:'#1d1b18'},badge);
   const bText=el('text',{'text-anchor':'middle','font-size':12,'font-weight':700,fill:'#fff','dominant-baseline':'central'},badge);
-  return {root,shadow,nameT,g,glow,...parts,halo,eyeDot,e1,e2,mouth,badge,bRect,bText,lastLabel:null};
+  return {root,shadow,nameT,aura,g,glow,...parts,halo,eyeDot,e1,e2,mouth,tears,badge,bRect,bText,lastLabel:null};
 });
 function drawPerson(i,p){
   const f=figs[i],r=ROLES[i];
@@ -479,6 +513,12 @@ function drawPerson(i,p){
   else if(FROWN.includes(ex))d=`M-6,${hy+8} Q0,${hy+2} 6,${hy+8}`;
   else d=`M-5,${hy+5} L5,${hy+5}`;
   f.mouth.setAttribute('d',d);
+  const crying=ex==='哭泣';f.tears.forEach((e,j)=>{e.style.display=crying?'':'none';if(crying){const ph=((t*1.6+j*.5)%1);
+    e.setAttribute('cx',j?5.5:-5.5);e.setAttribute('cy',hy+1+ph*9);e.setAttribute('opacity',1-ph*.6)}});
+  if(f.aura){const hk=harmonyAt(t);f.aura.setAttribute('opacity',hk*.7);
+    f.aura.setAttribute('transform',`translate(${X},${Y}) scale(${S}) rotate(${p.lean})`);
+    f.aura.setAttribute('cx',0);f.aura.setAttribute('cy',(hy-14)/2);f.aura.setAttribute('rx',38);f.aura.setAttribute('ry',-(hy-14)/2+16);
+    f.halo.setAttribute('stroke',mixHex('#B4B2A9','#E8B730',Math.min(1,hk)));f.halo.setAttribute('stroke-width',3.5+2*hk)}
   if(f.halo){f.halo.setAttribute('cy',hy-20);f.eyeDot.setAttribute('cx',0);f.eyeDot.setAttribute('cy',hy-9)}
   const label=(p.fz>.5?'定・':'')+ex;
   if(label!==f.lastLabel){f.lastLabel=label;f.bText.textContent=label;const w=14+12*[...label].length;f.bRect.setAttribute('x',-w/2);f.bRect.setAttribute('width',w);

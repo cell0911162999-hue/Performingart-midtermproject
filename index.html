@@ -103,6 +103,12 @@
   .s-cover h1{font-size:88px;font-weight:900;margin:10px 0 6px;letter-spacing:.04em}
   .s-cover .sub{font-size:28px;font-weight:700;color:#5b554c;margin-bottom:34px}
   .s-cover .meta{font-size:19px;color:var(--muted);margin-top:26px}
+  .s-cover .team{margin-top:34px;padding-top:20px;border-top:1px solid var(--line)}
+  .s-cover .team .tl{font-size:14px;font-weight:900;color:var(--muted);letter-spacing:.1em;margin-bottom:10px}
+  .s-cover .team .tm{display:flex;gap:40px;flex-wrap:wrap}
+  .s-cover .team .p{display:flex;flex-direction:column;gap:2px}
+  .s-cover .team .p small{font-size:15px;color:var(--muted)}
+  .s-cover .team .p b{font-size:22px;font-weight:900;letter-spacing:.06em}
 
   .s-concept .cols{display:flex;gap:40px;margin-top:26px}
   .s-concept .fig{flex:none;width:560px}
@@ -587,6 +593,8 @@ render();requestAnimationFrame(frame);
 /* 下載版 PDF 附上的網站連結；網站搬到別的網址（例如 GitHub Pages）時改這裡 */
 const SITE_URL='https://cell0911162999-hue.github.io/Performingart-midtermproject/';
 const TITLE='夢想與現實';
+/* 小組成員（簡報封面）：[班級, 姓名] */
+const TEAM=[['語創夜碩二','鄧容'],['兒英夜碩三','黃楷媜'],['音四甲','廖書妤'],['音五','梁文競']];
 const LIBS={
   h2c:'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
   pdf:'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
@@ -647,7 +655,8 @@ function buildSlides(pdf){
   const out=[];
   const add=(cls,html)=>{const d=document.createElement('div');d.className='slide '+cls;d.innerHTML=html;out.push(d);return d};
   add('s-cover',`<div class="kick">舞蹈創作・走位動畫簡報</div><h1>${TITLE}</h1><div class="sub">在老大哥的秩序裡，追夢的人會怎麼樣？</div>
-    ${chips()}<div class="meta">全長 ${fmt(TOTAL)} ・ ${SEGS.length} 個段落 ・ ${ROLES.length} 位角色</div>`);
+    ${chips()}<div class="meta">全長 ${fmt(TOTAL)} ・ ${SEGS.length} 個段落 ・ ${ROLES.length} 位角色</div>
+    <div class="team"><div class="tl">小組成員</div><div class="tm">${TEAM.map(([c,n])=>`<div class="p"><small>${c}</small><b>${n}</b></div>`).join('')}</div></div>`);
   const lead=`<p class="lead">${document.querySelector('.concept .lead').innerHTML}</p>`,idea=`<ul>${document.querySelector('.concept .idea').innerHTML}</ul>`;
   const cs=COVER
     ?add('s-concept has-cover',`<div class="kick">創作理念</div><h2>概念來自《1984》</h2>

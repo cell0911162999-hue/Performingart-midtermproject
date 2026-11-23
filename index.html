@@ -130,7 +130,7 @@
     <div class="tags" id="segTags"></div>
     <ul class="cues" id="segCues"></ul>
   </div>
-  <p class="note">動畫是走位示意，動作細節以排練為準。拖曳時間軸可以跳到任一秒；點段落按鈕可以直接看該段。上傳的音樂只在你自己的瀏覽器裡播放，不會傳到網路上；重新整理頁面後要再選一次。</p>
+  <p class="note">動畫是走位示意，動作細節以排練為準。拖曳時間軸可以跳到任一秒；點段落按鈕可以直接看該段。打開網頁時會自動載入預設配樂，按「▶ 播放」就會和動畫一起開始。也可以上傳別的音樂試聽：上傳的音樂只在你自己的瀏覽器裡播放，不會傳到網路上，重新整理頁面後會回到預設配樂。</p>
 </div>
 
 <script>
@@ -408,22 +408,47 @@ function audioSync(){
   audio.playbackRate=speed;
   if(playing){audioSeek();const pr=audio.play();if(pr&&pr.catch)pr.catch(()=>{})}else audio.pause();
 }
+/* 預設配樂：和 index.html 放在同一個資料夾。找不到檔案時，就跟原本一樣等使用者自己上傳。 */
+const DEFAULT_MUSIC='music.mp3';
+const NO_MUSIC='尚未選擇音樂（mp3、m4a、wav 都可以）';
+let usingDefault=false,defaultOk=false,defaultUrl=null;
+async function loadDefault(){
+  usingDefault=true;hasAudio=false;
+  $('fname').textContent='載入配樂中…';$('musicClear').hidden=true;$('mwarn').hidden=true;
+  /* 先整個下載成 blob：有些主機不支援分段讀取，直接串流時跳段落會失敗 */
+  if(!defaultUrl){try{const r=await fetch(DEFAULT_MUSIC);if(!r.ok)throw 0;defaultUrl=URL.createObjectURL(await r.blob())}catch(e){}}
+  if(!usingDefault)return; /* 下載期間使用者已上傳別的音樂 */
+  audio.src=defaultUrl||DEFAULT_MUSIC;audio.load();
+}
+audio.addEventListener('error',()=>{
+  if(!usingDefault)return;
+  usingDefault=false;defaultOk=false;hasAudio=false;audio.removeAttribute('src');
+  $('fname').textContent=NO_MUSIC;
+});
 $('musicFile').addEventListener('change',e=>{
   const f=e.target.files[0];if(!f)return;
   if(audioUrl)URL.revokeObjectURL(audioUrl);
+  usingDefault=false;
   audioUrl=URL.createObjectURL(f);audio.src=audioUrl;hasAudio=true;
   $('fname').textContent=f.name;$('musicClear').hidden=false;$('mwarn').hidden=true;
+  $('musicClear').textContent=defaultOk?'改回預設配樂':'移除';
   playing=false;t=0;updBtn();audio.currentTime=0;
 });
 audio.addEventListener('loadedmetadata',()=>{
+  if(usingDefault){defaultOk=true;hasAudio=true;$('fname').textContent='預設配樂';
+    if(playing)audioSync()}
   const d=audio.duration;$('fname').textContent+=`（${fmt(d)}）`;
   if(Math.abs(d-TOTAL)>3){$('mwarn').hidden=false;
     $('mwarn').textContent=`提醒：音樂長 ${fmt(d)}，動畫長 ${fmt(TOTAL)}，兩者會從 0:00 一起開始，${d>TOTAL?'動畫結束時音樂會一起停':'音樂會比動畫早結束'}。`}
 });
 audio.addEventListener('ended',()=>{});
-$('musicClear').onclick=()=>{audio.pause();audio.removeAttribute('src');audio.load();hasAudio=false;
+$('musicClear').onclick=()=>{audio.pause();hasAudio=false;
   if(audioUrl)URL.revokeObjectURL(audioUrl);audioUrl=null;$('musicFile').value='';
-  $('fname').textContent='尚未選擇音樂（mp3、m4a、wav 都可以）';$('musicClear').hidden=true;$('mwarn').hidden=true};
+  playing=false;t=0;updBtn();
+  if(defaultOk){loadDefault();return}
+  audio.removeAttribute('src');audio.load();
+  $('fname').textContent=NO_MUSIC;$('musicClear').hidden=true;$('mwarn').hidden=true};
+loadDefault();
 render();requestAnimationFrame(frame);
 
 </script>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>夢想與現實・走位動畫</title>
+<title>現實，還是夢想？｜115-1 劇場遊戲 期中考</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -15,6 +15,13 @@
   body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans TC",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   .wrap{max-width:780px;margin:0 auto;padding:14px 14px 40px}
   header h1{font-size:20px;font-weight:900;margin:4px 0 2px;letter-spacing:.02em}
+  header .course{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:6px}
+  header h1.theme{font-size:34px;line-height:1.25;margin:4px 0 4px;letter-spacing:.04em}
+  header .work{font-size:15px;font-weight:700;color:#5b554c;margin-bottom:10px}
+  header .team-row{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin:0 0 12px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+  header .team-row .tl{font-weight:900;color:var(--muted)}
+  header .team-row small{color:var(--muted);margin-right:4px;font-size:12px}
+  header .team-row b{font-weight:700}
   header p{margin:0 0 10px;color:var(--muted);font-size:13px}
   .legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
   .chip{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 5px;font-size:13px;font-weight:500}
@@ -158,14 +165,19 @@
   .s-end h2{font-size:64px}
   .s-end .lk{margin-top:30px;font-size:19px;color:var(--muted)}
   .s-end .url{font-size:24px;font-weight:700;color:var(--ink);text-decoration:none;border-bottom:2px solid var(--ink);margin-top:6px;word-break:break-all}
-  .s-end .qr{margin-top:28px;width:200px;height:200px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;box-sizing:border-box}
+  .s-end .eteam{margin-top:22px;font-size:16px;color:#5b554c}
+  .s-end .eteam b{color:var(--ink)}
+  .s-end .qr{margin-top:24px;width:200px;height:200px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;box-sizing:border-box}
   .s-end .qr svg,.s-end .qr img{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>夢想與現實・走位動畫</h1>
+    <div class="course" id="hCourse">115-1 劇場遊戲 期中考</div>
+    <h1 class="theme" id="hTheme">現實，還是夢想？</h1>
+    <div class="work">《夢想與現實》走位動畫</div>
+    <div class="team-row" id="teamRow"></div>
     <p>正面看舞台（觀眾視角）。人越往後越小；身體越矮代表 level 越低。頭上的標籤是表情：灰色＝正在動，黑色「定・」＝定像。</p>
     <div class="deck-btns">
       <button id="deckOpen">▶ 簡報模式</button>
@@ -200,6 +212,7 @@
       <text x="400" y="436" text-anchor="middle" font-size="12" fill="#b7ac97">▲ 觀眾</text>
       <g id="paths"></g>
       <g id="people"></g>
+      <g id="badges"></g>
     </svg>
     <div class="controls">
       <button class="primary" id="play">▶ 播放</button>
@@ -355,14 +368,16 @@ const D_SHOCK=P(540,.55,.8,40,105,{lean:-8,c:1,fz:1,ex:'震驚'});
 const Y_FALL=P(740,.55,.45,60,20,{lean:25,glow:.2,ex:'無力'});
 /* 05-2 群像預備位置 */
 const BB_PRE=P(400,.5,.95,25,25,{ex:'慈父微笑'});
-const R_PRE=P(235,.45,.78,40,40,{turn:.08,ex:'麻木'});
-const Y_PRE=P(590,.45,.72,30,30,{lean:10,glow:.25,ex:'無力'});
-const D_PRE=P(95,.2,.5,25,30,{lean:-6,c:1,ex:'無助'});
-/* 05-3 群像最終定像（觀眾看過去由左到右：夢想者｜現實者｜老大哥｜夢想） */
-const BB_FIN=P(400,.5,1.05,95,12,{fz:1,ex:'掌控'});                 /* 最高、挺直；左手橫出＝阻隔 */
-const R_FIN=P(270,.45,.6,-145,145,{lean:8,turn:.12,fz:1,ex:'崇拜'});  /* 中：高跪，雙手向上朝老大哥 */
-const Y_FIN=P(525,.45,.4,25,25,{lean:40,turn:.1,glow:.1,fz:1,ex:'無力'}); /* 最低：跪伏，向外向下 */
-const D_FIN=P(140,.2,.55,50,100,{lean:18,c:1,fz:1,ex:'渴望'});       /* 中低：向右延伸、伸手碰不到 */
+const R_PRE=P(290,.55,.78,40,40,{turn:.08,ex:'麻木'});
+const Y_PRE=P(550,.5,.72,30,30,{lean:10,glow:.25,ex:'無力'});
+const D_PRE=P(180,.2,.5,25,30,{lean:-6,c:1,ex:'無助'});
+/* 05-3 群像最終定像：四人緊靠成一組。
+   老大哥居中最高；現實者緊貼他左側高跪、仰頭向他伸手；夢想貼在他右側跪伏、向外向下；
+   夢想者從左前方低位探身伸手，手停在老大哥的腿前——老大哥的身體就是阻隔 */
+const BB_FIN=P(400,.5,1.05,120,50,{fz:1,ex:'掌控'});                   /* 最高、挺直；左手高舉在現實者上方，右手斜壓向夢想 */
+const R_FIN=P(330,.55,.56,-150,150,{lean:6,turn:.12,fz:1,ex:'崇拜'});   /* 中：高跪，身體與雙手朝向老大哥 */
+const Y_FIN=P(455,.5,.38,20,20,{lean:38,turn:.1,glow:.1,fz:1,ex:'無力'}); /* 最低：跪伏，向外向下、臉朝地 */
+const D_FIN=P(255,.2,.52,40,85,{lean:25,c:1,fz:1,ex:'渴望'});          /* 中低：向右探身伸手，碰不到 */
 
 SEGS[6].pose=[
  t=>seq(t,[[8,t=>P(330,.45,.82,40,40,{fz:1,ex:'慈父微笑'})],
@@ -387,13 +402,13 @@ SEGS[8].pose=[
  t=>kf(t,[[0,Y_FALL],[5,Y_FALL],[10,P(700,.5,.65,40,30,{lean:15,glow:.2,ex:'無力'})],[16,Y_PRE]])];
 SEGS[9].pose=[
  t=>kf(t,[[0,BB_PRE],[6,BB_FIN]]),
- t=>kf(t,[[0,D_PRE],[24,D_PRE],[26.5,P(110,.2,.75,40,70,{lean:5,c:1,ex:'渴望'})],[31,D_FIN]]),
+ t=>kf(t,[[0,D_PRE],[24,D_PRE],[26.5,P(230,.2,.75,40,70,{lean:5,c:1,ex:'渴望'})],[31,D_FIN]]),
  t=>kf(t,[[0,R_PRE],[8,R_PRE],[14,R_FIN]]),
  t=>kf(t,[[0,Y_PRE],[16,Y_PRE],[23,Y_FIN]])];
 SEGS[10].pose=[
  t=>exitPose(BB_FIN,P(850,.5,1,30,30),t,4.5),
  t=>exitPose(D_FIN,P(-90,.2,.8,30,30,{c:1}),t,0),
- t=>exitPose(R_FIN,P(-30,.45,.8,40,40),t,3),
+ t=>exitPose(R_FIN,P(-60,.55,.8,40,40),t,3),
  t=>exitPose(Y_FIN,P(840,.45,.85,30,30,{glow:.2}),t,1.5)];
 SEGS[11].pose=[t=>OFF,t=>OFF,t=>OFF,t=>OFF];
 
@@ -411,7 +426,7 @@ const mixHex=(a,b,k)=>{const A=hex2(a),B=hex2(b);return '#'+A.map((v,i)=>Math.ro
 /* ---------- people ---------- */
 const NS='http://www.w3.org/2000/svg';
 const el=(tag,attrs,parent)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent&&parent.appendChild(e);return e};
-const peopleG=document.getElementById('people');
+const peopleG=document.getElementById('people'),badgesG=document.getElementById('badges'); /* 表情標籤畫在最上層，不會被別的角色擋住 */
 const SMILE=['慈父微笑','快樂','自由','心動','希望','掌控','崇拜'],OPEN=['驚訝','震驚','被推開','推開','渴望'],FROWN=['痛苦','絕望','受傷','掙扎','無力','無助'];
 const figs=ROLES.map((r,i)=>{
   const root=el('g',{},peopleG);
@@ -427,7 +442,7 @@ const figs=ROLES.map((r,i)=>{
   const eyeDot=i===0?el('circle',{r:2.2,fill:'#E24B4A'},g):null;
   const e1=el('circle',{r:1.9,fill:r.feat},g),e2=el('circle',{r:1.9,fill:r.feat},g);
   const mouth=el('path',{fill:'none',stroke:r.feat,'stroke-width':1.8,'stroke-linecap':'round'},g);
-  const badge=el('g',{},root);
+  const badge=el('g',{},badgesG);
   const bRect=el('rect',{y:-11,height:22,rx:7,fill:'#1d1b18'},badge);
   const bText=el('text',{'text-anchor':'middle','font-size':12,'font-weight':700,fill:'#fff','dominant-baseline':'central'},badge);
   return {root,shadow,nameT,g,glow,...parts,halo,eyeDot,e1,e2,mouth,badge,bRect,bText,lastLabel:null};
@@ -463,8 +478,9 @@ function drawPerson(i,p){
   const label=(p.fz>.5?'定・':'')+ex;
   if(label!==f.lastLabel){f.lastLabel=label;f.bText.textContent=label;const w=14+12*[...label].length;f.bRect.setAttribute('x',-w/2);f.bRect.setAttribute('width',w);
     f.bRect.setAttribute('fill',p.fz>.5?'#1d1b18':'#6f6a62')}
-  f.badge.style.display=ex?'':'none';
-  f.badge.setAttribute('transform',`translate(${X},${Y+(hy-(f.halo?44:36))*S}) scale(${Math.max(.75,S)})`);
+  f.badge.style.display=ex?'':'none';f.badge.setAttribute('opacity',Math.max(0,Math.min(1,p.vis)));
+  const bo=hy-(f.halo?44:36),lr=ra(p.lean); /* 標籤跟著身體傾斜的方向走，停在頭的正上方 */
+  f.badge.setAttribute('transform',`translate(${X-bo*sin(lr)*S},${Y+bo*cos(lr)*S}) scale(${Math.max(.75,S)})`);
 }
 
 /* ---------- floor guides ---------- */
@@ -593,8 +609,12 @@ render();requestAnimationFrame(frame);
 /* 下載版 PDF 附上的網站連結；網站搬到別的網址（例如 GitHub Pages）時改這裡 */
 const SITE_URL='https://cell0911162999-hue.github.io/Performingart-midtermproject/';
 const TITLE='夢想與現實';
-/* 小組成員（簡報封面）：[班級, 姓名] */
+/* 課程、主題、小組成員：網站標題區、簡報封面、每頁頁尾與結尾頁都會用到，改這裡就會一起更新 */
+const COURSE='115-1 劇場遊戲 期中考';
+const THEME='現實，還是夢想？';
 const TEAM=[['語創夜碩二','鄧容'],['兒英夜碩三','黃楷媜'],['音四甲','廖書妤'],['音五','梁文競']];
+$('hCourse').textContent=COURSE;$('hTheme').textContent=THEME;
+$('teamRow').innerHTML=`<span class="tl">小組成員</span>`+TEAM.map(([c,n])=>`<span><small>${c}</small><b>${n}</b></span>`).join('');
 const LIBS={
   h2c:'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
   pdf:'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
@@ -654,7 +674,7 @@ const chips=()=>`<div class="s-chips">${ROLES.map(r=>`<span class="s-chip"><i st
 function buildSlides(pdf){
   const out=[];
   const add=(cls,html)=>{const d=document.createElement('div');d.className='slide '+cls;d.innerHTML=html;out.push(d);return d};
-  add('s-cover',`<div class="kick">舞蹈創作・走位動畫簡報</div><h1>${TITLE}</h1><div class="sub">在老大哥的秩序裡，追夢的人會怎麼樣？</div>
+  add('s-cover',`<div class="kick">${COURSE}</div><h1>${THEME}</h1><div class="sub">《${TITLE}》舞蹈創作・走位動畫</div>
     ${chips()}<div class="meta">全長 ${fmt(TOTAL)} ・ ${SEGS.length} 個段落 ・ ${ROLES.length} 位角色</div>
     <div class="team"><div class="tl">小組成員</div><div class="tm">${TEAM.map(([c,n])=>`<div class="p"><small>${c}</small><b>${n}</b></div>`).join('')}</div></div>`);
   const lead=`<p class="lead">${document.querySelector('.concept .lead').innerHTML}</p>`,idea=`<ul>${document.querySelector('.concept .idea').innerHTML}</ul>`;
@@ -677,9 +697,10 @@ function buildSlides(pdf){
         <div><span class="k">做法</span>${c.idea}</div><div><span class="k">提點</span>${c.hits.join('　')}</div></div></div></div>`);
     d.dataset.seg=k;const cp=conceptPart(s.ref);if(cp)d.appendChild(cp);
   });
-  add('s-end',`<div class="kick">${TITLE}・走位動畫</div><h2>謝謝觀看</h2><div class="lk">線上互動版（可播放動畫、配樂、拖曳時間軸）</div>
-    <a class="url" href="${SITE_URL}" target="_blank" rel="noopener" data-link>${SITE_URL}</a>${qrMarkup()?`<div class="qr" data-link>${qrMarkup()}</div>`:''}`);
-  out.forEach((d,i)=>d.insertAdjacentHTML('beforeend',`<div class="s-foot"><span>${TITLE}・走位動畫</span><span class="sp"></span>${pdf?`<a href="${SITE_URL}" data-link>網站：${SITE_URL}</a>`:''}<span>${i+1} / ${out.length}</span></div>`));
+  add('s-end',`<div class="kick">${COURSE}｜${THEME}</div><h2>謝謝觀看</h2><div class="lk">線上互動版（可播放動畫、配樂、拖曳時間軸）</div>
+    <a class="url" href="${SITE_URL}" target="_blank" rel="noopener" data-link>${SITE_URL}</a>${qrMarkup()?`<div class="qr" data-link>${qrMarkup()}</div>`:''}
+    <div class="eteam">小組成員　${TEAM.map(([c,n])=>`${c} <b>${n}</b>`).join('　・　')}</div>`);
+  out.forEach((d,i)=>d.insertAdjacentHTML('beforeend',`<div class="s-foot"><span>${COURSE}｜${THEME}</span><span class="sp"></span>${pdf?`<a href="${SITE_URL}" data-link>網站：${SITE_URL}</a>`:''}<span>${i+1} / ${out.length}</span></div>`));
   return out;
 }
 
@@ -753,7 +774,7 @@ async function downloadPdf(){
       doc.addImage(cv.toDataURL('image/jpeg',.9),'JPEG',0,0,1280,720,undefined,'FAST');
       d.querySelectorAll('[data-link]').forEach(a=>{const r=a.getBoundingClientRect();doc.link(r.left-o.left,r.top-o.top,r.width,r.height,{url:SITE_URL})});
     }
-    doc.setProperties({title:`${TITLE}・走位動畫簡報`,subject:SITE_URL});
+    doc.setProperties({title:`${THEME}｜${COURSE}`,subject:SITE_URL});
     doc.save('dream-and-reality-slides.pdf'); /* 英文檔名：部分瀏覽器會把中文檔名改成 download */
   }catch(e){alert('PDF 產生失敗：'+(e&&e.message||e)+'\n請確認網路連線後再試一次。')}
   finally{box.remove();t=saved.t;stopAt=saved.stopAt;playing=saved.playing;updBtn();audioSync();render();

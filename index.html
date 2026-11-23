@@ -109,6 +109,16 @@
   .s-concept .fig svg{width:100%;display:block;background:#fff;border:1px solid var(--line);border-radius:12px}
   .s-concept .lead{font-size:19px;line-height:1.75;margin:0}
   .s-concept ul{margin:14px 0 0;padding-left:22px;font-size:17px;line-height:1.7}
+  /* 有《1984》封面圖時：左邊概念圖＋文字，右邊封面 */
+  .s-concept.has-cover .cols{gap:36px;margin-top:20px}
+  .s-concept.has-cover .main{flex:1;min-width:0}
+  .s-concept.has-cover .row{display:flex;gap:22px;align-items:flex-start}
+  .s-concept.has-cover .fig{width:340px}
+  .s-concept.has-cover .lead{font-size:17px;line-height:1.7}
+  .s-concept.has-cover ul{font-size:16px;line-height:1.65;margin-top:12px}
+  .s-concept .cv{flex:none;width:320px;height:500px;display:flex;flex-direction:column;align-items:center}
+  .s-concept .cv img{max-width:100%;max-height:476px;display:block;border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.18)}
+  .s-concept .cv small{margin-top:6px;font-size:12px;color:var(--muted)}
 
   .s-over table{width:100%;border-collapse:collapse;margin-top:16px;font-size:16px}
   .s-over td{padding:5px 10px;border-top:1px solid var(--line)}
@@ -118,6 +128,11 @@
   .s-over td.d{color:#5b554c}
 
   .s-seg .cols{display:flex;gap:34px;margin-top:18px}
+  .s-seg .cpart{position:absolute;top:22px;right:64px;width:460px;height:118px;display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px 8px 8px;box-sizing:border-box}
+  .s-seg .cpart svg{flex:none;width:200px;height:100px;display:block;background:#fff;border-radius:8px}
+  .s-seg .cpart .ct{font-size:12px;font-weight:900;color:var(--muted);letter-spacing:.06em;margin-bottom:4px}
+  .s-seg .cpart .ci{font-size:14px;line-height:1.45}
+  .s-seg .cpart .ci b{margin-right:4px}
   .s-seg .left{flex:none;width:600px}
   .s-seg .stagebox{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative}
   .s-seg .stagebox svg{display:block;width:100%;height:auto}
@@ -600,6 +615,31 @@ function qrMarkup(){
   if(!window.qrcode)return '';
   try{const q=qrcode(0,'M');q.addData(SITE_URL);q.make();return q.createSvgTag({cellSize:4,margin:0,scalable:true})}catch(e){return ''}
 }
+/* 第二頁右邊的《1984》封面：和 index.html 放在同一個資料夾，檔名 cover.jpg（或 .png / .jpeg / .webp）。找不到就用原本的版面 */
+let COVER=null;
+(async()=>{for(const f of ['cover.jpg','cover.png','cover.jpeg','cover.webp']){
+  const ok=await new Promise(r=>{const i=new Image();i.onload=()=>r(i.naturalWidth>0);i.onerror=()=>r(false);i.src=f});
+  if(ok){COVER=f;return}}})();
+/* 段落投影片右上角的「概念圖局部」：放大本段用到的圖形（黑色），附近其他圖形淡淡保留當位置參考 */
+const REF_BOX={curves:[393,355,787,882],steps:[618,777,1322,882],circles:[926,333,1475,686],seesaw:[1260,685,1660,858]};
+const REF_INFO={circles:['圈圈上階梯','越往上越小，追不到的夢想'],steps:['階梯','一階一階往上'],
+  curves:['兩條圓弧','由上往下、能量漸弱的墜落'],seesaw:['蹺蹺板','在夢想與現實之間搖擺']};
+function conceptPart(keys){
+  keys=(keys||[]).filter(k=>REF_BOX[k]);if(!keys.length)return null;
+  let [x0,y0,x1,y1]=[1e9,1e9,-1e9,-1e9];
+  keys.forEach(k=>{const b=REF_BOX[k];x0=Math.min(x0,b[0]);y0=Math.min(y0,b[1]);x1=Math.max(x1,b[2]);y1=Math.max(y1,b[3])});
+  const pad=40,R=200/100;x0-=pad;y0-=pad;x1+=pad;y1+=pad;
+  let w=x1-x0,h=y1-y0;if(w/h<R){const nw=h*R;x0-=(nw-w)/2;w=nw}else{const nh=w/R;y0-=(nh-h)/2;h=nh}
+  const c=$('ref').cloneNode(true);c.removeAttribute('id');c.setAttribute('xmlns',NS);c.setAttribute('viewBox',`${x0} ${y0} ${w} ${h}`);
+  c.setAttribute('preserveAspectRatio','xMidYMid meet');c.removeAttribute('aria-label');
+  c.querySelectorAll('g').forEach(g=>{const col=keys.includes(g.dataset.k)?'#1d1b18':'#e6dfd2';
+    const on=keys.includes(g.dataset.k);
+    g.querySelectorAll('*').forEach(e=>{e.setAttribute('stroke',col);if(e.tagName==='polygon')e.setAttribute('fill',col);
+      const sw=+(e.getAttribute('stroke-width')||g.getAttribute('stroke-width')||0);if(on&&sw)e.setAttribute('stroke-width',sw*2)})});
+  const box=document.createElement('div');box.className='cpart';box.appendChild(c);
+  box.insertAdjacentHTML('beforeend',`<div><div class="ct">本段使用的概念圖</div>${keys.map(k=>`<div class="ci"><b>${REF_INFO[k][0]}</b>${REF_INFO[k][1]}</div>`).join('')}</div>`);
+  return box;
+}
 const chips=()=>`<div class="s-chips">${ROLES.map(r=>`<span class="s-chip"><i style="background:${r.c2||r.c}"></i>${r.name}<small>${r.note}</small></span>`).join('')}</div>`;
 
 /* 依序建立每一張投影片。pdf=true 時舞台放靜態截圖、頁尾附網站連結 */
@@ -608,9 +648,13 @@ function buildSlides(pdf){
   const add=(cls,html)=>{const d=document.createElement('div');d.className='slide '+cls;d.innerHTML=html;out.push(d);return d};
   add('s-cover',`<div class="kick">舞蹈創作・走位動畫簡報</div><h1>${TITLE}</h1><div class="sub">在老大哥的秩序裡，追夢的人會怎麼樣？</div>
     ${chips()}<div class="meta">全長 ${fmt(TOTAL)} ・ ${SEGS.length} 個段落 ・ ${ROLES.length} 位角色</div>`);
-  const cs=add('s-concept',`<div class="kick">創作理念</div><h2>概念來自《1984》</h2>
-    <div class="cols"><div class="fig"></div><div><p class="lead">${document.querySelector('.concept .lead').innerHTML}</p>
-    <ul>${document.querySelector('.concept .idea').innerHTML}</ul></div></div>`);
+  const lead=`<p class="lead">${document.querySelector('.concept .lead').innerHTML}</p>`,idea=`<ul>${document.querySelector('.concept .idea').innerHTML}</ul>`;
+  const cs=COVER
+    ?add('s-concept has-cover',`<div class="kick">創作理念</div><h2>概念來自《1984》</h2>
+      <div class="cols"><div class="main"><div class="row"><div class="fig"></div>${lead}</div>${idea}</div>
+      <div class="cv"><img src="${COVER}" alt="《1984》封面"><small>《1984》George Orwell</small></div></div>`)
+    :add('s-concept',`<div class="kick">創作理念</div><h2>概念來自《1984》</h2>
+      <div class="cols"><div class="fig"></div><div>${lead}${idea}</div></div>`);
   cs.querySelector('.fig').appendChild(conceptSvg());
   add('s-over',`<div class="kick">角色與段落</div><h2>作品結構</h2><div style="margin-top:20px">${chips()}</div>
     <table>${SEGS.map(s=>`<tr><td class="n">${s.name}</td><td class="tm">${fmt(s.start)}–${fmt(s.start+s.dur)}</td><td class="w">${s.wall}</td><td class="d">${s.wallSub}</td></tr>`).join('')}</table>`);
@@ -622,7 +666,7 @@ function buildSlides(pdf){
       <div class="right"><div class="lab">走位與動作</div><ul class="cuesv">${s.cues.map((q,i)=>`<li><span class="dotv" style="background:${roleCol(i,k)}"></span><span><b>${ROLES[i].name}</b>　${q}</span></li>`).join('')}</ul>
         <div class="mus"><div class="lab" style="margin:0">音樂</div><div><span class="k">情緒</span>${c.mood}</div><div><span class="k">力度</span>${c.dyn}　<span class="k">速度</span>${c.tempo}</div>
         <div><span class="k">做法</span>${c.idea}</div><div><span class="k">提點</span>${c.hits.join('　')}</div></div></div></div>`);
-    d.dataset.seg=k;
+    d.dataset.seg=k;const cp=conceptPart(s.ref);if(cp)d.appendChild(cp);
   });
   add('s-end',`<div class="kick">${TITLE}・走位動畫</div><h2>謝謝觀看</h2><div class="lk">線上互動版（可播放動畫、配樂、拖曳時間軸）</div>
     <a class="url" href="${SITE_URL}" target="_blank" rel="noopener" data-link>${SITE_URL}</a>${qrMarkup()?`<div class="qr" data-link>${qrMarkup()}</div>`:''}`);

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="330 300 1400 620" width="1400" height="620"><title>點線面圖譜（語創夜碩二 鄧容 繪製）</title><rect x="330" y="300" width="1400" height="620" fill="#fff"/>
+<g stroke="#1d1b18" data-k="curves" fill="none"><path d="M490 685 C 430 520 420 400 520 375 C 600 355 700 365 780 383" stroke-width="14"/><path d="M400 875 C 420 750 460 690 520 678 C 570 670 620 695 658 723" stroke-width="5"/></g>
+<g stroke="#1d1b18" data-k="steps" stroke-width="5"><line x1="618" y1="877" x2="1017" y2="877"/><line x1="922" y1="782" x2="1322" y2="782"/></g>
+<g stroke="#1d1b18" data-k="circles" fill="none" stroke-width="5"><circle cx="1023" cy="589" r="97"/><circle cx="1244" cy="462" r="75"/><circle cx="1424" cy="384" r="51"/></g>
+<g stroke="#1d1b18" data-k="seesaw" stroke-width="5"><line x1="1260" y1="687" x2="1660" y2="687"/><polygon fill="#1d1b18" points="1458,688 1358,858 1557,858" stroke-width="0"/></g></svg>

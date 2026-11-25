@@ -80,6 +80,106 @@
   .ck{flex:none;width:48px;color:var(--muted);font-weight:700;font-size:13px}
   .cv.big{font-weight:700;font-size:15px}
   .hits{margin:0;padding-left:18px}
+  /* 點線面圖譜 ↔ 彩色圖譜 對照 */
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+  @media (max-width:600px){.pair{grid-template-columns:1fr}}
+  .pf{margin:0}
+  .pw{position:relative}
+  .pw.art img{width:100%;display:block;border-radius:10px}
+  .concept .pw .artov,.slide .pw .artov{position:absolute;left:0;top:0;width:100%;height:100%;background:none;border:0;border-radius:0}
+  .artov rect{transition:opacity .2s}
+  .mk{position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none}
+  .mk span{position:absolute;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;color:#fff;font-size:12px;font-weight:900;display:grid;place-items:center;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);transition:opacity .2s}
+  .pf figcaption{font-size:12px;color:var(--muted);margin-top:4px;text-align:center}
+  .maplist{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:6px}
+  .maplist li{display:flex;gap:8px;font-size:13px;line-height:1.5;align-items:flex-start;transition:opacity .2s}
+  .no{flex:none;width:20px;height:20px;border-radius:50%;color:#fff;font-size:11px;font-weight:900;display:grid;place-items:center;margin-top:1px}
+  .maplist .ar{color:var(--muted);margin:0 2px}
+  .maplist li.ex{color:var(--muted);font-size:12px;padding-left:28px}
+  .credit{display:block;font-size:11px;color:#9a9284;font-weight:400;margin-top:2px}
+  .pair{grid-template-columns:1fr 28px 1fr!important;align-items:center}
+  .pair .arrow{font-size:22px;color:var(--muted);text-align:center;font-weight:900}
+  @media (max-width:600px){.pair{grid-template-columns:1fr!important}.pair .arrow{transform:rotate(90deg)}}
+  .frame{aspect-ratio:1200/896;background:#fff;border:1px solid var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .concept .frame svg{border:0;border-radius:0;background:none}
+  .pw.art img{aspect-ratio:1200/896;object-fit:cover}
+  /* 樂譜跟隨 */
+  .follow{display:flex;gap:12px;align-items:center;padding:0 12px 12px}
+  .fimg{flex:none;height:150px;position:relative;background-color:#fff;background-repeat:no-repeat;border:1px solid var(--line);border-radius:8px;cursor:zoom-in;overflow:hidden}
+  .fimg i,.sys i{position:absolute;top:0;bottom:0;box-sizing:border-box}
+  .fimg i{background:rgba(242,193,78,.28);border:2px solid #E0A82E;border-radius:4px}
+  .finfo{min-width:0;font-size:13px;line-height:1.55}
+  .finfo .fm{font-weight:900;font-size:15px}
+  .finfo .fs{color:var(--muted)}
+  .finfo button{margin-top:6px;padding:5px 10px;font-size:12px}
+  /* 段落卡：圖譜與總譜 */
+  .segx{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+  @media (max-width:600px){.segx{grid-template-columns:1fr}}
+  .segx>div{min-width:0}
+  .segart .cpart{flex-wrap:wrap}
+  .sxt{font-size:12px;font-weight:900;color:var(--muted);letter-spacing:.06em;margin-bottom:6px}
+  .sxt span{font-weight:400}
+  .segart .cpart{display:flex;gap:10px;align-items:center}
+  .segart .crop{flex:none;width:200px;height:100px;border-radius:8px;position:relative;overflow:hidden;background-repeat:no-repeat}
+  .segart .crop i{position:absolute;border:2px dashed;border-radius:6px;box-sizing:border-box}
+  .segart .ct{display:none}
+  .segart .ci{font-size:13px;line-height:1.5}
+  .segart .ci .no{display:inline-grid;width:16px;height:16px;font-size:10px;margin-right:4px;vertical-align:-2px}
+  .segart .ci small{color:var(--muted);font-size:11px}
+  .segart .none{font-size:13px;color:var(--muted)}
+  .sysrow{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+  .sys{flex:none;position:relative;background-color:#fff;background-repeat:no-repeat;border:1px solid var(--line);border-radius:6px;overflow:hidden;cursor:zoom-in}
+  .sys i.dim{background:rgba(246,242,234,.78)}
+  /* 總譜卡與檢視器 */
+  .scorecard summary{cursor:pointer;font-size:15px;list-style:none}
+  .scorecard summary::-webkit-details-marker{display:none}
+  .scorecard summary:before{content:'▸ ';color:var(--muted)}
+  .scorecard[open] summary:before{content:'▾ '}
+  .scorecard a{font-size:13px;font-weight:700;color:var(--ink)}
+  .thumbs{display:flex;gap:8px;overflow-x:auto;margin:12px 0 8px;padding-bottom:4px}
+  .thumbs button{flex:none;padding:0;border-radius:6px;overflow:hidden;background:#fff}
+  .thumbs img{height:130px;display:block}
+  .thumbs span{display:block;font-size:11px;color:var(--muted);padding:2px 0}
+  #sv{position:fixed;inset:0;z-index:60;background:rgba(29,27,24,.92);display:none;flex-direction:column}
+  #sv.on{display:flex}
+  #sv .bar{display:flex;gap:6px;align-items:center;padding:8px 10px;color:#fff;flex-wrap:wrap}
+  #sv .bar button{background:#2d2a26;color:#fff;border-color:#45403a;padding:6px 10px;font-size:13px}
+  #sv .bar .sp{flex:1}
+  #sv .body{flex:1;overflow:auto;padding:8px;text-align:center}
+  #sv .pg{position:relative;display:inline-block;background:#fff;vertical-align:top}
+  #sv .pg img{display:block;width:100%}
+  #sv .pg i{position:absolute;background:rgba(242,193,78,.25);border:2px solid #E0A82E;border-radius:4px;box-sizing:border-box}
+  /* 下載與頁尾 */
+  .dl ul{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:8px}
+  .dl li{display:flex;gap:10px;align-items:center;font-size:14px;flex-wrap:wrap}
+  .dl a,.dl button{display:inline-block;border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 12px;font-size:13px;font-weight:700;color:var(--ink);text-decoration:none;cursor:pointer}
+  .dl small{color:var(--muted)}
+  .foot{margin-top:16px;font-size:12px;color:#9a9284;line-height:1.7}
+  /* 投影片：總圖譜、總譜、分工、下載 */
+  .s-map .two{display:flex;align-items:center;gap:18px;margin-top:14px}
+  .s-map .two .pf{width:460px;margin:0}
+  .s-map .frame,.s-map .pw.art img{width:460px;height:343px;border-radius:12px;box-sizing:border-box}
+  .s-map .arrow{font-size:40px;color:var(--muted);font-weight:900}
+  .s-map .pf figcaption{font-size:13px;text-align:center;margin-top:4px}
+  .s-map .credit{font-size:12px}
+  .s-map .maplist{grid-template-columns:1fr 1fr;gap:6px 24px;margin-top:8px}
+  .s-map .maplist li{font-size:13.5px;line-height:1.45}
+  .s-map .maplist li.ex{grid-column:1/-1;font-size:12px}
+  .s-score .grid{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-content:flex-start;margin-top:14px;height:500px}
+  .s-score .sys{cursor:default;border-radius:8px}
+  .s-score .ms{font-size:17px;color:var(--muted);font-weight:700;margin-left:10px}
+  .s-score .note2{position:absolute;right:64px;top:58px;font-size:13px;color:var(--muted);text-align:right;line-height:1.6}
+  .s-team table{width:100%;border-collapse:collapse;margin-top:26px;font-size:20px}
+  .s-team td{padding:14px 12px;border-top:1px solid var(--line)}
+  .s-team td.r{font-weight:900;width:330px}
+  .s-team td.c{color:var(--muted);width:200px}
+  .s-team td.n{font-weight:700}
+  .s-team .hint2{margin-top:14px;font-size:14px;color:var(--muted)}
+  .s-dl ul{list-style:none;padding:0;margin:26px 0 0;display:grid;gap:14px}
+  .s-dl li{font-size:20px;display:flex;gap:16px;align-items:baseline}
+  .s-dl li b{width:220px;flex:none}
+  .s-dl a{color:var(--ink);font-size:16px;word-break:break-all}
+  .s-dl .hint2{margin-top:22px;font-size:15px;color:var(--muted)}
 
   /* ---------- 簡報模式 ---------- */
   .deck-btns{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
@@ -143,8 +243,11 @@
   .s-over td.d{color:#5b554c}
 
   .s-seg .cols{display:flex;gap:34px;margin-top:18px}
-  .s-seg .cpart{position:absolute;top:22px;right:64px;width:460px;height:118px;display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px 8px 8px;box-sizing:border-box}
-  .s-seg .cpart svg{flex:none;width:200px;height:100px;display:block;background:#fff;border-radius:8px}
+  .s-seg .cpart{position:absolute;top:22px;right:64px;width:480px;height:118px;display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px 8px 8px;box-sizing:border-box}
+  .s-seg .cpart .crop{flex:none;width:200px;height:100px;border-radius:8px;position:relative;overflow:hidden;background-repeat:no-repeat}
+  .s-seg .cpart .crop i{position:absolute;border:2.5px dashed;border-radius:8px;box-sizing:border-box}
+  .s-seg .cpart .ci .no{display:inline-grid;width:16px;height:16px;font-size:10px;margin-right:4px;vertical-align:-2px}
+  .s-seg .cpart .ci small{color:var(--muted);font-size:12px}
   .s-seg .cpart .ct{font-size:12px;font-weight:900;color:var(--muted);letter-spacing:.06em;margin-bottom:4px}
   .s-seg .cpart .ci{font-size:14px;line-height:1.45}
   .s-seg .cpart .ci b{margin-right:4px}
@@ -188,9 +291,14 @@
     </div>
   </header>
   <div class="card concept">
-    <div class="ctitle">主要概念圖</div>
-    <svg id="ref" viewBox="330 300 1400 620" aria-label="主要概念圖"></svg>
-    <p class="refnote">播放時，黑色的圖形＝這一段用到的元素；序幕到分化還沒用到，整張圖都是黑的。</p>
+    <div class="ctitle">主要概念圖：點線面圖譜 ↔ 彩色圖譜</div>
+    <div class="pair">
+      <figure class="pf"><div class="frame"><svg id="ref" viewBox="330 300 1400 620" aria-label="點線面圖譜"></svg></div><figcaption>點線面圖譜<small class="credit" data-credit="diagram"></small></figcaption></figure>
+      <div class="arrow" aria-hidden="true">→</div>
+      <figure class="pf"><div class="pw art"><img src="concept-art.jpg" alt="依故事加工的彩色圖譜"><svg class="artov" id="artOv" viewBox="0 0 1200 896" preserveAspectRatio="none" aria-hidden="true"></svg><div class="mk" id="artMk"></div></div><figcaption>彩色圖譜（依故事內容加工）<small class="credit" data-credit="art"></small></figcaption></figure>
+    </div>
+    <ol class="maplist" id="mapList"></ol>
+    <p class="refnote">左邊的點線面圖譜加工成右邊的彩色圖譜；右圖的編號對應下面的說明。播放時，兩張圖上亮著的部分就是這一段用到的元素（序幕到分化還沒用到，所以全部亮著）。</p>
     <div class="ctitle" style="margin-top:12px">創作理念</div>
     <p class="lead">概念來自《1984》：在老大哥的秩序裡，人們整齊劃一、麻木地生活。夢想出現後，有人追求、有人推開；最後夢想被老大哥消滅，故事停在追夢的人最痛苦的時候。</p>
     <ul class="idea">
@@ -231,6 +339,11 @@
       <span class="fname" id="fname">尚未選擇音樂（mp3、m4a、wav 都可以）</span>
       <button id="musicClear" hidden>移除</button>
       <span class="warn" id="mwarn" hidden></span>
+      <small class="credit" data-credit="music" style="width:100%"></small>
+    </div>
+    <div class="follow" id="follow" title="點一下放大這一頁">
+      <div class="fimg" id="fImg"><i id="fBox"></i></div>
+      <div class="finfo"><div class="fm" id="fM"></div><div class="fs" id="fS"></div><button id="fOpen">🔍 放大這一頁總譜</button></div>
     </div>
   </div>
   <div class="segs" id="segs"></div>
@@ -239,8 +352,28 @@
     <div class="sub" id="segSub"></div>
     <div class="tags" id="segTags"></div>
     <ul class="cues" id="segCues"></ul>
+    <div class="segx">
+      <div><div class="sxt">本段在彩色圖譜中</div><div class="segart" id="segArt"></div></div>
+      <div><div class="sxt">本段總譜 <span id="segMs"></span></div><div class="sysrow" id="segScore"></div></div>
+    </div>
+  </div>
+  <details class="card scorecard" id="scoreCard">
+    <summary><b>總譜</b>（10 頁，點頁面可放大縮放）<small class="credit" data-credit="music"></small></summary>
+    <div class="thumbs" id="thumbs"></div>
+    <a href="score.pdf" download>⬇ 下載總譜 PDF</a>
+  </details>
+  <div class="card dl" id="downloads">
+    <div class="ctitle">資源下載</div>
+    <ul>
+      <li><button id="dlPdf">⬇ 簡報 PDF</button><small>按下後在瀏覽器裡產生，約需 10–20 秒</small></li>
+      <li><a href="score.pdf" download>⬇ 總譜 PDF</a><small>MuseScore 總譜，79 小節</small></li>
+      <li><a href="music.mp4" download="reaching-beyond-music.mp4">⬇ 配樂</a><small>音訊檔（AAC，2:42）</small></li>
+      <li><a href="concept-art.jpg" download="reaching-beyond-color-chart.jpg">⬇ 彩色圖譜</a><small>JPG</small></li>
+      <li><a href="concept-diagram.svg" download="reaching-beyond-point-line-plane.svg">⬇ 點線面圖譜</a><small>SVG 向量圖，可任意放大</small></li>
+    </ul>
   </div>
   <p class="note">動畫是走位示意，動作細節以排練為準。拖曳時間軸可以跳到任一秒；點段落按鈕可以直接看該段。打開網頁時會自動載入預設配樂，按「▶ 播放」就會和動畫一起開始。也可以上傳別的音樂試聽：上傳的音樂只在你自己的瀏覽器裡播放，不會傳到網路上，重新整理頁面後會回到預設配樂。</p>
+  <p class="foot" id="foot"></p>
 </div>
 
 <script>
@@ -468,6 +601,28 @@ SEGS[10].pose=[
 SEGS[11].pose=[t=>OFF,t=>OFF,t=>OFF,t=>OFF];
 
 let acc=0;SEGS.forEach(s=>{s.start=acc;acc+=s.dur});const TOTAL=acc;
+/* 總譜：每一行（system）＝[頁, 上緣, 下緣, 第一小節, [小節線 x…]]，座標是頁面寬高的比例 */
+const SCORE_SYS=[[1,0.0667,0.9316,1,[0.1903,0.4065,0.5694,0.7371,0.9274]],[2,0.0501,0.9299,5,[0.1621,0.4403,0.6669,0.9274]],[3,0.0501,0.4849,8,[0.1621,0.4532,0.6879,0.9274]],[3,0.5254,0.9276,11,[0.1621,0.3726,0.5169,0.7169,0.8355,0.9274]],[4,0.0519,0.4707,16,[0.1621,0.2782,0.3589,0.4371,0.5476,0.6742,0.8008,0.9274]],[4,0.5134,0.9191,23,[0.1621,0.3589,0.4968,0.6347,0.7718,0.9274]],[5,0.0501,0.4974,28,[0.1621,0.3589,0.454,0.6032,0.7169,0.8137,0.9274]],[5,0.559,0.9259,34,[0.1621,0.3508,0.4637,0.5629,0.7056,0.8048,0.9274]],[6,0.0501,0.4524,40,[0.1621,0.3403,0.4548,0.5492,0.6702,0.8073,0.9274]],[6,0.5379,0.9214,46,[0.1621,0.3484,0.4105,0.5016,0.5927,0.6548,0.7339,0.825,0.9274]],[7,0.0501,0.4917,54,[0.1621,0.4339,0.5782,0.7226,0.8702]],[7,0.5214,0.9276,58,[0.1621,0.5839,0.9274]],[8,0.0501,0.4194,60,[0.1621,0.5016,0.7702,0.9274]],[8,0.4809,0.9191,63,[0.1621,0.3887,0.6202,0.7589,0.9274]],[9,0.0501,0.5157,67,[0.1621,0.3919,0.6032,0.8315,0.9081]],[9,0.6034,0.943,71,[0.1621,0.4024,0.5573,0.7645,0.9274]],[10,0.0501,0.9362,75,[0.1621,0.3508,0.4855,0.621,0.7669,0.9266]]];
+/* 第 1–79 小節的開始秒數（第 80 個＝結束），依總譜速度記號換算，並用錄音中的休止與力度變化校正 */
+const MEAS_T=[0.0,6.0,12.0,14.07,16.14,18.21,20.28,22.35,24.42,26.49,28.56,30.63,32.7,33.74,34.69,36.0,37.66,39.33,41.0,43.5,45.64,47.78,49.92,52.06,54.2,56.34,58.48,60.62,62.76,64.9,65.79,66.68,67.56,68.45,69.34,70.23,71.11,72.0,72.89,73.78,74.66,75.55,76.44,77.33,78.21,79.1,79.99,80.88,81.76,82.65,83.54,84.42,85.31,86.2,87.09,87.97,88.86,89.75,91.75,93.75,98.0,102.25,106.5,111.25,116.0,120.75,122.54,124.33,126.12,127.91,128.8,133.42,136.5,141.18,144.3,148.17,150.75,153.75,156.75,159.75];
+const PAGE_AR=1755/1240,SCORE_X=[.02,.96]; /* 頁面高寬比；裁切總譜時保留的左右範圍 */
+const measAt=tt=>{let m=1;while(m<79&&MEAS_T[m]<=tt)m++;return m};      /* 某一秒正在演奏的小節 */
+const sysOf=m=>SCORE_SYS.find(q=>m>=q[3]&&m<q[3]+q[4].length-1);
+/* 一行總譜的裁切圖。opt：{h 或 w, range:[m0,m1] 範圍外變淡, cur:目前小節} */
+function sysCrop(q,opt){
+  const [pg,y0,y1,m0,bars]=q,cw=SCORE_X[1]-SCORE_X[0],ch=y1-y0+.012;
+  const W=opt.w||opt.h*cw/(ch*PAGE_AR),H=W*ch*PAGE_AR/cw,pw=W/cw,ph=pw*PAGE_AR;
+  const d=document.createElement('div');d.className='sys';d.dataset.page=pg;
+  d.style.cssText=`width:${W}px;height:${H}px;background-image:url(score/p${String(pg).padStart(2,'0')}.webp);background-size:${pw}px ${ph}px;background-position:${-SCORE_X[0]*pw}px ${-(y0-.006)*ph}px`;
+  const X=f=>(f-SCORE_X[0])*pw;
+  for(let i=0;i<bars.length-1;i++){const m=m0+i,box=`left:${X(bars[i])}px;width:${X(bars[i+1])-X(bars[i])}px`;
+    if(opt.range&&(m<opt.range[0]||m>opt.range[1]))d.insertAdjacentHTML('beforeend',`<i class="dim" style="${box}"></i>`);
+    if(opt.cur===m)d.insertAdjacentHTML('beforeend',`<i style="${box};background:rgba(242,193,78,.28);border:2px solid #E0A82E;border-radius:4px"></i>`)}
+  return d}
+const segMeas=k=>{const s=SEGS[k];return [measAt(s.start+.05),measAt(Math.min(s.start+s.dur,TOTAL)-.05)]};
+const sysInRange=([a,b])=>SCORE_SYS.filter(q=>q[3]<=b&&q[3]+q[4].length-2>=a);
+const TEMPO_AT=[[1,'♩=60・6/4'],[3,'♩=116・4/4'],[13,'♩=116・2/4'],[14,'♩=126'],[15,'♩=92'],[16,'♩=72'],[19,'♩=72・3/4'],[20,'♩=84・3/4'],[30,'附點二分音符=69・3/4'],[51,'漸慢'],[54,'3/4'],[58,'♩=120・4/4'],[60,'漸慢'],[63,'♩=48'],[66,'♩=144'],[70,'♩=144・2/4'],[71,'♩=42'],[77,'♩=60・3/4']];
+const tempoOf=m=>{let r='';for(const [a,v] of TEMPO_AT)if(m>=a)r=v;return r};
 function poseAt(i,t){
   let k=SEGS.length-1;for(let j=0;j<SEGS.length;j++){if(t<SEGS[j].start+SEGS[j].dur){k=j;break}}
   const s=SEGS[k],tl=Math.min(t-s.start,s.dur);let p=s.pose[i](tl);
@@ -568,8 +723,68 @@ ref.innerHTML=`
 <g data-k="steps" stroke-width="5"><line x1="618" y1="877" x2="1017" y2="877"/><line x1="922" y1="782" x2="1322" y2="782"/></g>
 <g data-k="circles" fill="none" stroke-width="5"><circle cx="1023" cy="589" r="97"/><circle cx="1244" cy="462" r="75"/><circle cx="1424" cy="384" r="51"/></g>
 <g data-k="seesaw" stroke-width="5"><line x1="1260" y1="687" x2="1660" y2="687"/><polygon points="1458,688 1358,858 1557,858" stroke-width="0"/></g>`;
-function refHi(keys){ref.querySelectorAll('g').forEach(g=>{const c=(!keys.length||keys.includes(g.dataset.k))?'#1d1b18':'#c9c1b2';
-  g.querySelectorAll('*').forEach(e=>{e.setAttribute('stroke',c);if(e.tagName==='polygon')e.setAttribute('fill',c)})})}
+/* 點線面圖譜 ↔ 彩色圖譜（concept-art.jpg，1200×896）的對照。
+   sv＝編號在點線面圖上的位置（viewBox 座標），ap＝編號在彩色圖上的位置，box＝彩色圖上的範圍 [x0,y0,x1,y1] */
+const ART={src:'concept-art.jpg',w:1200,h:896};
+const MAP=[
+ {k:'circles',n:1,col:'#C9971C',dot:'越來越小的圓',art:'太陽與月亮',desc:'中央的太陽往右上越變越小，旁邊的圓缺成月牙：一直追、卻越來越遠的夢想',short:'越來越小、缺成月牙的夢想',sv:[1244,462],ap:[690,395],box:[565,60,1150,515]},
+ {k:'steps',n:2,col:'#2E7BC9',dot:'階梯（兩條橫線）',art:'倒下的兩個人',desc:'逐夢者與夢想一上一下橫躺，像兩階階梯；逐夢者伸手向太陽，卻碰不到',short:'一上一下橫躺，伸手碰不到太陽',sv:[970,830],ap:[600,700],box:[150,500,850,875]},
+ {k:'curves',n:3,col:'#8E44AD',dot:'左邊兩條圓弧',art:'老大哥的弧形身體',desc:'白色老大哥彎成大弧形，從左上往下罩住倒下的兩人：失去夢想後的墜落',short:'彎成大弧形，往下罩住兩人',sv:[470,520],ap:[260,170],box:[5,105,520,820]},
+ {k:'seesaw',n:4,col:'#138D75',dot:'三角形與橫線',art:'三角形與長板',desc:'右下架在三角形上的長板就是蹺蹺板：順從者在夢想與現實之間搖擺',short:'蹺蹺板：在夢想與現實之間搖擺',sv:[1458,770],ap:[930,600],box:[675,335,1200,655]}];
+const MAP_EXTRA='圖中其他符號：老大哥手上的橄欖枝（假的和平）牽出細線，經過三角形，把順從者倒吊在木板上。';
+const pct=(v,a,b)=>((v-a)/b*100).toFixed(2)+'%';
+const refMarks=()=>MAP.map(m=>`<span data-k="${m.k}" style="left:${pct(m.sv[0],330,1400)};top:${pct(m.sv[1],300,620)};background:${m.col}">${m.n}</span>`).join('');
+const artMarks=()=>MAP.map(m=>`<span data-k="${m.k}" style="left:${pct(m.ap[0],0,ART.w)};top:${pct(m.ap[1],0,ART.h)};background:${m.col}">${m.n}</span>`).join('');
+const artBoxes=()=>MAP.map(m=>`<rect data-k="${m.k}" x="${m.box[0]}" y="${m.box[1]}" width="${m.box[2]-m.box[0]}" height="${m.box[3]-m.box[1]}" rx="22" fill="none" stroke="${m.col}" stroke-width="7" stroke-dasharray="22 12"/>`).join('');
+const mapItems=()=>MAP.map(m=>`<li data-k="${m.k}"><span class="no" style="background:${m.col}">${m.n}</span><span><b>${m.dot}</b><span class="ar">→</span><b>${m.art}</b>：${m.desc}</span></li>`).join('')+`<li class="ex">${MAP_EXTRA}</li>`;
+const colorRef=(svg,on)=>svg.querySelectorAll('g').forEach(g=>{const m=MAP.find(x=>x.k===g.dataset.k);const c=on(g.dataset.k)?m.col:'#d9d2c4';
+  g.querySelectorAll('*').forEach(e=>{e.setAttribute('stroke',c);if(e.tagName==='polygon')e.setAttribute('fill',c)})});
+document.getElementById('artMk').innerHTML=artMarks();
+document.getElementById('artOv').innerHTML=artBoxes();document.getElementById('mapList').innerHTML=mapItems();
+function refHi(keys){const on=k=>!keys.length||keys.includes(k);
+  ref.querySelectorAll('g').forEach(g=>{const c=on(g.dataset.k)?'#1d1b18':'#c9c1b2';g.querySelectorAll('*').forEach(e=>{e.setAttribute('stroke',c);if(e.tagName==='polygon')e.setAttribute('fill',c)})});
+  document.querySelectorAll('.concept [data-k]').forEach(e=>{if(e.closest('#ref'))return;e.style.opacity=on(e.dataset.k)?1:(e.tagName==='rect'?.12:.3)})}
+
+/* ---------- 總譜：跟隨、段落、檢視器 ---------- */
+const fmt1=x=>`${Math.floor(x/60)}:${(x%60).toFixed(1).padStart(4,'0')}`;
+let followM=0;
+function updFollow(){
+  const m=measAt(Math.min(t,TOTAL-.01));if(m===followM)return;followM=m;
+  const q=sysOf(m),box=$('fImg');box.replaceChildren(sysCrop(q,{h:150,cur:m}));box.dataset.page=q[0];box.dataset.m=m;
+  $('fM').textContent=`第 ${m} 小節／共 79 小節`;
+  $('fS').textContent=`${fmt1(MEAS_T[m-1])} 起・${tempoOf(m)}・總譜第 ${q[0]} 頁`;
+}
+function segExtras(k){
+  const cp=conceptPart(SEGS[k].ref);
+  if(cp)$('segArt').replaceChildren(cp);else $('segArt').innerHTML='<div class="none">這一段還沒用到圖譜元素。</div>';
+  const r=segMeas(k);$('segMs').textContent=`m${r[0]}–${r[1]}・${fmt1(MEAS_T[r[0]-1])}–${fmt1(MEAS_T[r[1]])}`;
+  $('segScore').replaceChildren(...sysInRange(r).map(q=>{const d=sysCrop(q,{h:120,range:r});d.title=`第 ${q[0]} 頁，點一下放大`;d.onclick=()=>openScore(q[0],Math.max(r[0],q[3]));return d}));
+}
+let svPage=1,svZoom=1,svM=0;
+function openScore(pg,m){
+  let v=$('sv');
+  if(!v){v=document.createElement('div');v.id='sv';
+    v.innerHTML=`<div class="bar"><b id="svT"></b><button data-a="prev">‹ 上一頁</button><button data-a="next">下一頁 ›</button><span class="sp"></span>
+      <button data-a="out" aria-label="縮小">－</button><span id="svZ"></span><button data-a="in" aria-label="放大">＋</button><button data-a="fit">適合寬度</button><button data-a="close">✕ 關閉</button></div>
+      <div class="body" id="svB"><div class="pg"><img id="svI" alt="總譜"><i id="svH" hidden></i></div></div>`;
+    document.body.appendChild(v);
+    v.querySelector('.bar').onclick=e=>{const a=e.target.dataset.a;if(!a)return;
+      if(a==='close')v.classList.remove('on');if(a==='prev')showPage(svPage-1);if(a==='next')showPage(svPage+1);
+      if(a==='in')zoomTo(svZoom*1.25);if(a==='out')zoomTo(svZoom/1.25);if(a==='fit')zoomTo(1)};
+    $('svB').addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey){e.preventDefault();zoomTo(svZoom*(e.deltaY<0?1.1:1/1.1))}},{passive:false});
+    document.addEventListener('keydown',e=>{if(!v.classList.contains('on'))return;
+      if(e.key==='Escape')v.classList.remove('on');else if(e.key==='ArrowRight')showPage(svPage+1);else if(e.key==='ArrowLeft')showPage(svPage-1);
+      else if(e.key==='+'||e.key==='=')zoomTo(svZoom*1.25);else if(e.key==='-')zoomTo(svZoom/1.25)});}
+  svM=m||0;v.classList.add('on');showPage(pg);
+}
+function zoomTo(z){svZoom=Math.max(.5,Math.min(4,z));const B=$('svB'),base=Math.min(B.clientWidth-16,900);
+  const cx=(B.scrollLeft+B.clientWidth/2)/B.scrollWidth,cy=(B.scrollTop+B.clientHeight/2)/B.scrollHeight;
+  document.querySelector('#sv .pg').style.width=base*svZoom+'px';$('svZ').textContent=Math.round(svZoom*100)+'%';
+  B.scrollLeft=cx*B.scrollWidth-B.clientWidth/2;B.scrollTop=cy*B.scrollHeight-B.clientHeight/2}
+function showPage(pg){svPage=Math.max(1,Math.min(10,pg));$('svI').src=`score/p${String(svPage).padStart(2,'0')}.webp`;
+  $('svT').textContent=`總譜 第 ${svPage} / 10 頁`;const q=svM&&sysOf(svM),h=$('svH');
+  if(q&&q[0]===svPage){const i=svM-q[3];h.hidden=false;h.style.cssText=`left:${q[4][i]*100}%;width:${(q[4][i+1]-q[4][i])*100}%;top:${q[1]*100}%;height:${(q[2]-q[1])*100}%`}else h.hidden=true;
+  zoomTo(svZoom);$('svB').scrollTop=q&&q[0]===svPage?Math.max(0,q[1]*$('svB').scrollHeight-20):0}
 
 /* ---------- UI ---------- */
 const $=id=>document.getElementById(id);
@@ -588,6 +803,7 @@ function setInfo(k){
   document.querySelectorAll('.band').forEach(b=>b.classList.toggle('on',+b.dataset.k===k));
   document.querySelectorAll('#segs button').forEach(b=>b.classList.toggle('on',+b.dataset.k===k));
   refHi(s.ref);guide(k);
+  segExtras(k);
 }
 function render(){
   const ps=ROLES.map((_,i)=>poseAt(i,Math.min(t,TOTAL-0.001)));
@@ -595,6 +811,7 @@ function render(){
   ps.map((o,i)=>[o.p.z,i]).sort((a,b)=>b[0]-a[0]).forEach(([,i])=>{peopleG.appendChild(figs[i].root);drawPerson(i,ps[i].p)});
   $('time').textContent=`${fmt(t)} / ${fmt(TOTAL)}`;
   $('headbar').style.left=(t/TOTAL*100)+'%';
+  updFollow();
 }
 function frame(ts){
   if(playing){
@@ -679,6 +896,16 @@ const TAGLINE='永遠碰不到的夢想';
 const TEAM=[['語創夜碩二','鄧容'],['兒英夜碩三','黃楷媜'],['音四甲','廖書妤'],['音五','梁文競']];
 $('hCourse').textContent=COURSE;$('hTheme').textContent=THEME;$('hSub').textContent=SUBTITLE;$('hTag').textContent=`「${TAGLINE}」`;
 document.title=`${THEME}｜${COURSE}`;
+/* 創作者署名（灰色小字）與分工 */
+const CREDITS={diagram:'語創夜碩二 鄧容 繪製',art:'音四甲 廖書妤 繪製',music:'音樂創作（配樂、總譜）：音五 梁文競 編製創作',web:'網站製作：兒英夜碩三 黃楷媜'};
+const DUTIES=[['編舞','全體共同創作','鄧容、黃楷媜、廖書妤、梁文競'],['點線面圖譜（黑白幾何圖）','語創夜碩二','鄧容'],['彩色圖譜','音四甲','廖書妤'],
+  ['音樂創作（配樂、總譜）','音五','梁文競'],['網站製作','兒英夜碩三','黃楷媜'],['簡報製作','兒英夜碩三','黃楷媜']];
+const DL=[['總譜 PDF','score.pdf'],['配樂（音訊檔）','music.mp4'],['彩色圖譜','concept-art.jpg'],['點線面圖譜','concept-diagram.svg'],['網站（含簡報 PDF 下載）','#downloads']];
+document.querySelectorAll('[data-credit]').forEach(e=>e.textContent=CREDITS[e.dataset.credit]);
+$('foot').innerHTML=`點線面圖譜：${CREDITS.diagram}　・　彩色圖譜：${CREDITS.art}<br>${CREDITS.music}<br>${CREDITS.web}`;
+$('thumbs').innerHTML=Array.from({length:10},(_,i)=>`<button data-p="${i+1}" aria-label="總譜第 ${i+1} 頁"><img src="score/p${String(i+1).padStart(2,'0')}.webp" loading="lazy" alt=""><span>第 ${i+1} 頁</span></button>`).join('');
+$('thumbs').onclick=e=>{const b=e.target.closest('button');if(b)openScore(+b.dataset.p)};
+$('fImg').onclick=$('fOpen').onclick=()=>openScore(+$('fImg').dataset.page,+$('fImg').dataset.m);
 $('teamRow').innerHTML=`<span class="tl">小組成員</span>`+TEAM.map(([c,n])=>`<span><small>${c}</small><b>${n}</b></span>`).join('');
 const LIBS={
   h2c:'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
@@ -713,24 +940,19 @@ let COVER=null;
 (async()=>{for(const f of ['cover.jpg','cover.png','cover.jpeg','cover.webp']){
   const ok=await new Promise(r=>{const i=new Image();i.onload=()=>r(i.naturalWidth>0);i.onerror=()=>r(false);i.src=f});
   if(ok){COVER=f;return}}})();
-/* 段落投影片右上角的「概念圖局部」：放大本段用到的圖形（黑色），附近其他圖形淡淡保留當位置參考 */
-const REF_BOX={curves:[393,355,787,882],steps:[618,777,1322,882],circles:[926,333,1475,686],seesaw:[1260,685,1660,858]};
-const REF_INFO={circles:['圈圈上階梯','越往上越小，追不到的夢想'],steps:['階梯','一階一階往上'],
-  curves:['兩條圓弧','由上往下、能量漸弱的墜落'],seesaw:['蹺蹺板','在夢想與現實之間搖擺']};
+/* 段落投影片右上角的「概念圖局部」：以彩色圖譜為主，放大本段用到的部分並框出來，旁邊寫出對應的點線面元素 */
 function conceptPart(keys){
-  keys=(keys||[]).filter(k=>REF_BOX[k]);if(!keys.length)return null;
+  const ms=MAP.filter(m=>(keys||[]).includes(m.k));if(!ms.length)return null;
   let [x0,y0,x1,y1]=[1e9,1e9,-1e9,-1e9];
-  keys.forEach(k=>{const b=REF_BOX[k];x0=Math.min(x0,b[0]);y0=Math.min(y0,b[1]);x1=Math.max(x1,b[2]);y1=Math.max(y1,b[3])});
-  const pad=40,R=200/100;x0-=pad;y0-=pad;x1+=pad;y1+=pad;
-  let w=x1-x0,h=y1-y0;if(w/h<R){const nw=h*R;x0-=(nw-w)/2;w=nw}else{const nh=w/R;y0-=(nh-h)/2;h=nh}
-  const c=$('ref').cloneNode(true);c.removeAttribute('id');c.setAttribute('xmlns',NS);c.setAttribute('viewBox',`${x0} ${y0} ${w} ${h}`);
-  c.setAttribute('preserveAspectRatio','xMidYMid meet');c.removeAttribute('aria-label');
-  c.querySelectorAll('g').forEach(g=>{const col=keys.includes(g.dataset.k)?'#1d1b18':'#e6dfd2';
-    const on=keys.includes(g.dataset.k);
-    g.querySelectorAll('*').forEach(e=>{e.setAttribute('stroke',col);if(e.tagName==='polygon')e.setAttribute('fill',col);
-      const sw=+(e.getAttribute('stroke-width')||g.getAttribute('stroke-width')||0);if(on&&sw)e.setAttribute('stroke-width',sw*2)})});
-  const box=document.createElement('div');box.className='cpart';box.appendChild(c);
-  box.insertAdjacentHTML('beforeend',`<div><div class="ct">本段使用的概念圖</div>${keys.map(k=>`<div class="ci"><b>${REF_INFO[k][0]}</b>${REF_INFO[k][1]}</div>`).join('')}</div>`);
+  ms.forEach(m=>{x0=Math.min(x0,m.box[0]);y0=Math.min(y0,m.box[1]);x1=Math.max(x1,m.box[2]);y1=Math.max(y1,m.box[3])});
+  const R=2,pad=20;x0-=pad;y0-=pad;x1+=pad;y1+=pad;let w=x1-x0,h=y1-y0;
+  if(w/h<R){const nw=h*R;x0-=(nw-w)/2;w=nw}else{const nh=w/R;y0-=(nh-h)/2;h=nh}
+  if(w>ART.w){x0=0;w=ART.w;h=w/R}if(h>ART.h){y0=0;h=ART.h;w=h*R}
+  x0=Math.max(0,Math.min(ART.w-w,x0));y0=Math.max(0,Math.min(ART.h-h,y0));
+  const k=200/w,box=document.createElement('div');box.className='cpart';
+  box.innerHTML=`<div class="crop" style="background-image:url(${ART.src});background-size:${ART.w*k}px ${ART.h*k}px;background-position:${-x0*k}px ${-y0*k}px">${
+    ms.map(m=>`<i style="left:${(m.box[0]-x0)*k}px;top:${(m.box[1]-y0)*k}px;width:${(m.box[2]-m.box[0])*k}px;height:${(m.box[3]-m.box[1])*k}px;border-color:${m.col}"></i>`).join('')}</div>
+    <div><div class="ct">本段在彩色圖譜中</div>${ms.map(m=>`<div class="ci"><span class="no" style="background:${m.col}">${m.n}</span><b>${m.art}</b>${m.short}<small>（點線面：${m.dot}）</small></div>`).join('')}</div>`;
   return box;
 }
 const chips=()=>`<div class="s-chips">${ROLES.map(r=>`<span class="s-chip"><i style="background:${r.c2||r.c}"></i>${r.name}<small>${r.note}</small></span>`).join('')}</div>`;
@@ -749,7 +971,13 @@ function buildSlides(pdf){
       <div class="cv"><img src="${COVER}" alt="《1984》封面"><small>《1984》George Orwell</small></div></div>`)
     :add('s-concept',`<div class="kick">創作理念</div><h2>概念來自《1984》</h2>
       <div class="cols"><div class="fig"></div><div>${lead}${idea}</div></div>`);
-  cs.querySelector('.fig').appendChild(conceptSvg());
+  cs.querySelector('.fig').appendChild(conceptSvg());cs.querySelector('.fig').insertAdjacentHTML('beforeend',`<small class="credit">點線面圖譜：${CREDITS.diagram}</small>`);
+  const ms=add('s-map',`<div class="kick">圖譜</div><h2>總圖譜</h2>
+    <div class="two"><figure class="pf"><div class="frame"></div><figcaption>點線面圖譜<small class="credit">${CREDITS.diagram}</small></figcaption></figure>
+      <div class="arrow">→</div>
+      <figure class="pf"><div class="pw art"><img src="${ART.src}" alt="彩色圖譜"><svg class="artov" viewBox="0 0 ${ART.w} ${ART.h}" preserveAspectRatio="none">${artBoxes()}</svg><div class="mk">${artMarks()}</div></div><figcaption>彩色圖譜（依故事內容加工）<small class="credit">${CREDITS.art}</small></figcaption></figure></div>
+    <ol class="maplist">${mapItems()}</ol>`);
+  {const sv=conceptSvg();sv.style.width='100%';ms.querySelector('.frame').appendChild(sv)}
   add('s-over',`<div class="kick">角色與段落</div><h2>作品結構</h2><div style="margin-top:20px">${chips()}</div>
     <table>${SEGS.map(s=>`<tr><td class="n">${s.name}</td><td class="tm">${fmt(s.start)}–${fmt(s.start+s.dur)}</td><td class="w">${s.wall}</td><td class="d">${s.wallSub}</td></tr>`).join('')}</table>`);
   SEGS.forEach((s,k)=>{
@@ -761,7 +989,20 @@ function buildSlides(pdf){
         <div class="mus"><div class="lab" style="margin:0">音樂</div><div><span class="k">情緒</span>${c.mood}</div><div><span class="k">力度</span>${c.dyn}　<span class="k">速度</span>${c.tempo}</div>
         <div><span class="k">做法</span>${c.idea}</div><div><span class="k">提點</span>${c.hits.join('　')}</div></div></div></div>`);
     d.dataset.seg=k;const cp=conceptPart(s.ref);if(cp)d.appendChild(cp);
+    {const r=segMeas(k),qs=sysInRange(r);
+     const sc=add('s-score',`<div class="kick">段落 ${k+1} / ${SEGS.length} ・ 總譜</div><h2>${s.name}<span class="ms">m${r[0]}–${r[1]}　${fmt1(MEAS_T[r[0]-1])}–${fmt1(MEAS_T[r[1]])}</span></h2>
+       <div class="note2">淡色的小節不屬於這一段<br>${CREDITS.music}</div><div class="grid"></div>`);
+     const g=sc.querySelector('.grid'),GW=1152,GH=500,GAP=12,cw=SCORE_X[1]-SCORE_X[0];
+     const ar=qs.map(q=>(q[2]-q[1]+.012)*PAGE_AR/cw);let best=null;   /* 選一個讓每行總譜都最大的排法 */
+     for(let c=1;c<=qs.length;c++){const rows=Math.ceil(qs.length/c),cellW=(GW-(c-1)*GAP)/c,cellH=(GH-(rows-1)*GAP)/rows;
+       const ws=ar.map(a=>Math.min(cellW,cellH/a)),mn=Math.min(...ws);if(!best||mn>best.mn)best={mn,ws}}
+     qs.forEach((q,i)=>g.appendChild(sysCrop(q,{w:best.ws[i],range:r})))}
   });
+  add('s-team',`<div class="kick">小組分工</div><h2>分工表</h2>
+    <table>${DUTIES.map(([r,c,n])=>`<tr><td class="r">${r}</td><td class="c">${c}</td><td class="n">${n}</td></tr>`).join('')}</table>`);
+  add('s-dl',`<div class="kick">資源下載</div><h2>可下載的資源</h2>
+    <ul>${DL.map(([n,f])=>`<li><b>${n}</b><a href="${SITE_URL}${f}" target="_blank" rel="noopener" data-link>${SITE_URL}${f}</a></li>`).join('')}</ul>
+    <div class="hint2">簡報 PDF：在網站「資源下載」按「⬇ 簡報 PDF」即可產生最新版本。</div>`);
   add('s-end',`<div class="kick">${COURSE}｜${THEME}・${TAGLINE}</div><h2>謝謝觀看</h2><div class="lk">線上互動版（可播放動畫、配樂、拖曳時間軸）</div>
     <a class="url" href="${SITE_URL}" target="_blank" rel="noopener" data-link>${SITE_URL}</a>${qrMarkup()?`<div class="qr" data-link>${qrMarkup()}</div>`:''}
     <div class="eteam">小組成員　${TEAM.map(([c,n])=>`${c} <b>${n}</b>`).join('　・　')}</div>`);
@@ -837,7 +1078,7 @@ async function downloadPdf(){
       const cv=await html2canvas(d,{scale:2,backgroundColor:'#f6f2ea',logging:false,useCORS:true});
       if(i)doc.addPage([1280,720],'landscape');
       doc.addImage(cv.toDataURL('image/jpeg',.9),'JPEG',0,0,1280,720,undefined,'FAST');
-      d.querySelectorAll('[data-link]').forEach(a=>{const r=a.getBoundingClientRect();doc.link(r.left-o.left,r.top-o.top,r.width,r.height,{url:SITE_URL})});
+      d.querySelectorAll('[data-link]').forEach(a=>{const r=a.getBoundingClientRect();doc.link(r.left-o.left,r.top-o.top,r.width,r.height,{url:a.getAttribute('href')||SITE_URL})});
     }
     doc.setProperties({title:`${THEME}｜${COURSE}`,subject:SITE_URL});
     doc.save('reaching-beyond-slides.pdf'); /* 英文檔名：部分瀏覽器會把中文檔名改成 download */
@@ -845,7 +1086,7 @@ async function downloadPdf(){
   finally{box.remove();t=saved.t;stopAt=saved.stopAt;playing=saved.playing;updBtn();audioSync();render();
     btns.forEach((b,i)=>b.textContent=labels[i]);pdfBusy=false}
 }
-$('pdfBtn').onclick=downloadPdf;$('dPdf').onclick=downloadPdf;
+$('pdfBtn').onclick=downloadPdf;$('dPdf').onclick=downloadPdf;$('dlPdf').onclick=downloadPdf;
 
 </script>
 </body>

@@ -383,7 +383,7 @@
     <ul>
       <li><button id="dlPdf">⬇ 簡報 PDF</button><small>按下後在瀏覽器裡產生，約需 10–20 秒</small></li>
       <li><a href="score.pdf" download>⬇ 總譜 PDF</a><small>MuseScore 總譜，79 小節</small></li>
-      <li><a href="music.mp4" download="reaching-beyond-music.mp4">⬇ 配樂</a><small>音訊檔（AAC，2:42）</small></li>
+      <li><a href="music.mp3" download="reaching-beyond-music.mp3">⬇ 配樂</a><small>MP3（2:42）</small></li>
       <li><a href="concept-art.jpg" download="reaching-beyond-color-chart.jpg">⬇ 彩色圖譜</a><small>JPG</small></li>
       <li><a href="concept-diagram.svg" download="reaching-beyond-point-line-plane.svg">⬇ 點線面圖譜</a><small>SVG 向量圖，可任意放大</small></li>
     </ul>
@@ -853,7 +853,7 @@ function audioSync(){
   if(playing){audioSeek();const pr=audio.play();if(pr&&pr.catch)pr.catch(()=>{})}else audio.pause();
 }
 /* 預設配樂：和 index.html 放在同一個資料夾。找不到檔案時，就跟原本一樣等使用者自己上傳。 */
-const DEFAULT_MUSIC='music.mp4';
+const DEFAULT_MUSIC='music.mp3';
 const NO_MUSIC='尚未選擇音樂（mp3、m4a、wav 都可以）';
 let usingDefault=false,defaultOk=false,defaultUrl=null;
 async function loadDefault(){
@@ -910,7 +910,7 @@ document.title=`${THEME}｜${COURSE}`;
 const CREDITS={diagram:'語創夜碩二 鄧容 繪製',art:'音四甲 廖書妤 繪製',music:'音樂創作（配樂、總譜）：音五 梁文競 編製創作',web:'網站製作：兒英夜碩三 黃楷媜'};
 const DUTIES=[['編舞','全體共同創作','鄧容、黃楷媜、廖書妤、梁文競'],['點線面圖譜（黑白幾何圖）','語創夜碩二','鄧容'],['彩色圖譜','音四甲','廖書妤'],
   ['音樂創作（配樂、總譜）','音五','梁文競'],['網站製作','兒英夜碩三','黃楷媜'],['簡報製作','兒英夜碩三','黃楷媜']];
-const DL=[['總譜 PDF','score.pdf'],['配樂（音訊檔）','music.mp4'],['彩色圖譜','concept-art.jpg'],['點線面圖譜','concept-diagram.svg'],['網站（含簡報 PDF 下載）','#downloads']];
+const DL=[['總譜 PDF','score.pdf'],['配樂（音訊檔）','music.mp3'],['彩色圖譜','concept-art.jpg'],['點線面圖譜','concept-diagram.svg'],['網站（含簡報 PDF 下載）','#downloads']];
 document.querySelectorAll('[data-credit]').forEach(e=>e.textContent=CREDITS[e.dataset.credit]);
 $('foot').innerHTML=`點線面圖譜：${CREDITS.diagram}　・　彩色圖譜：${CREDITS.art}<br>${CREDITS.music}<br>${CREDITS.web}`;
 $('thumbs').innerHTML=Array.from({length:10},(_,i)=>`<button data-p="${i+1}" aria-label="總譜第 ${i+1} 頁"><img src="score/p${String(i+1).padStart(2,'0')}.webp" loading="lazy" alt=""><span>第 ${i+1} 頁</span></button>`).join('');

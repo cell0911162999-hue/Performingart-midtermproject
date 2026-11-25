@@ -104,14 +104,18 @@
   .concept .frame svg{border:0;border-radius:0;background:none}
   .pw.art img{aspect-ratio:1200/896;object-fit:cover}
   /* 樂譜跟隨 */
-  .follow{display:flex;gap:12px;align-items:center;padding:0 12px 12px}
-  .fimg{flex:none;height:150px;position:relative;background-color:#fff;background-repeat:no-repeat;border:1px solid var(--line);border-radius:8px;cursor:zoom-in;overflow:hidden}
-  .fimg i,.sys i{position:absolute;top:0;bottom:0;box-sizing:border-box}
-  .fimg i{background:rgba(242,193,78,.28);border:2px solid #E0A82E;border-radius:4px}
-  .finfo{min-width:0;font-size:13px;line-height:1.55}
-  .finfo .fm{font-weight:900;font-size:15px}
-  .finfo .fs{color:var(--muted)}
-  .finfo button{margin-top:6px;padding:5px 10px;font-size:12px}
+  /* 總譜和舞台同步：寬螢幕並排，手機放在舞台下方 */
+  .follow{display:flex;justify-content:center;align-items:center;height:250px;padding:8px 12px 4px;box-sizing:border-box;border-top:1px solid var(--line);background:#fff}
+  .fimg{position:relative}
+  .fimg .sys{cursor:default;border:0}
+  .sys i{position:absolute;top:0;bottom:0;box-sizing:border-box}
+  .flab{position:absolute;left:6px;top:4px;background:rgba(29,27,24,.82);color:#fff;font-size:12px;font-weight:700;border-radius:6px;padding:2px 8px;white-space:nowrap}
+  .stagecredit{padding:0 12px 10px}
+  @media (min-width:1100px){
+    .wrap{max-width:1120px}
+    .stagegrid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);align-items:stretch}
+    .follow{height:auto;border-top:0;border-left:1px solid var(--line);padding:10px}
+  }
   /* 段落卡：圖譜與總譜 */
   .segx{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
   @media (max-width:600px){.segx{grid-template-columns:1fr}}
@@ -165,6 +169,18 @@
   .s-map .maplist{grid-template-columns:1fr 1fr;gap:6px 24px;margin-top:8px}
   .s-map .maplist li{font-size:13.5px;line-height:1.45}
   .s-map .maplist li.ex{grid-column:1/-1;font-size:12px}
+  .s-seg2 .cols{gap:30px;margin-top:14px}
+  .s-seg2 .left{width:560px}
+  .s-seg2 .mus2{margin-top:14px;font-size:15px;line-height:1.65;display:grid;gap:6px}
+  .s-seg2 .mus2 .k{color:var(--muted);font-weight:700;margin-right:8px}
+  .s-seg2 .right{flex:1;min-width:0}
+  .s-seg2 .scorehd{font-size:14px;font-weight:900;color:var(--muted);letter-spacing:.06em;margin-bottom:6px}
+  .s-seg2 .scorehd span{font-weight:400;letter-spacing:0;margin-left:6px}
+  .s-seg2 .scorebox{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;justify-content:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px;box-sizing:border-box;min-height:120px}
+  .s-seg2 .scorebox .sys{border:0;cursor:default}
+  .s-seg2 .right .credit{font-size:12px;margin:4px 0 10px}
+  .s-seg2 .right .cpart{position:static;width:auto;height:auto;padding:8px}
+  .s-seg2 .flab{position:absolute;left:8px;top:6px;background:rgba(29,27,24,.82);color:#fff;font-size:13px;font-weight:700;border-radius:6px;padding:2px 8px}
   .s-score .grid{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-content:flex-start;margin-top:14px;height:500px}
   .s-score .sys{cursor:default;border-radius:8px}
   .s-score .ms{font-size:17px;color:var(--muted);font-weight:700;margin-left:10px}
@@ -310,6 +326,7 @@
   </div>
   <div class="legend" id="legend"></div>
   <div class="stage">
+    <div class="stagegrid"><div class="sg-anim">
     <svg id="stage" viewBox="0 0 800 440" aria-label="舞台走位動畫">
       <defs>
         <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#efe9dd"/><stop offset="1" stop-color="#e6dfd0"/></linearGradient>
@@ -327,6 +344,9 @@
       <g id="people"></g>
       <g id="badges"></g>
     </svg>
+    </div>
+    <div class="follow" id="follow"><div class="fimg" id="fImg"></div></div>
+    </div>
     <div class="controls">
       <button class="primary" id="play">▶ 播放</button>
       <button id="restart" aria-label="從頭">⟲</button>
@@ -334,17 +354,13 @@
       <span class="time" id="time">0:00</span>
     </div>
     <div class="timeline" id="timeline"><div class="bands" id="bands"></div><div class="head" id="headbar"></div></div>
-    <div class="music-up">
+    <div class="music-up" style="display:none"><!-- 已改為自動載入配樂，上傳功能不再顯示 -->
       <label>♪ 上傳音樂檔<input type="file" id="musicFile" accept="audio/*"></label>
       <span class="fname" id="fname">尚未選擇音樂（mp3、m4a、wav 都可以）</span>
       <button id="musicClear" hidden>移除</button>
       <span class="warn" id="mwarn" hidden></span>
-      <small class="credit" data-credit="music" style="width:100%"></small>
     </div>
-    <div class="follow" id="follow" title="點一下放大這一頁">
-      <div class="fimg" id="fImg"><i id="fBox"></i></div>
-      <div class="finfo"><div class="fm" id="fM"></div><div class="fs" id="fS"></div><button id="fOpen">🔍 放大這一頁總譜</button></div>
-    </div>
+    <small class="credit stagecredit" data-credit="music"></small>
   </div>
   <div class="segs" id="segs"></div>
   <div class="card">
@@ -404,15 +420,15 @@ const ROLES=[
  {name:'夢想',c:'#E24B4A',feat:'#ffffff',note:'紅色'}];
 
 const SEGS=[
- {name:'01 序幕',dur:18,wall:'點・線',wallSub:'老大哥與麻木的人',ele:'老大哥是台前的一個點；順從者走在一條直線上',lvl:'老大哥高位；順從者中位',ref:[],
-  cues:['走到台前，帶著慈父般的微笑面對群眾；高位，穩穩站著','還沒出場（0:28 才進場）','在後方整齊劃一地走路出場，像機器一樣；中位，麻木、沒有表情','還沒出場'],
+ {name:'01 序幕',dur:18,wall:'點・線',wallSub:'老大哥與麻木的人',ele:'老大哥是台前的一個點；兩個順從者走在同一條直線上',lvl:'老大哥高位；兩人中位',ref:[],
+  cues:['走到台前，帶著慈父般的微笑面對群眾；高位，穩穩站著','（這時還是順從者）和另一個順從者整齊劃一地走路出場；中位，麻木、沒有表情','和另一個順從者一起出場，步伐完全同步，像機器一樣；中位，麻木','還沒出場'],
   comp:{mood:'安靜開場→老大哥的和弦→機械式進行曲',dyn:'p → 0:12 銅鈸 fff → 0:16 全體 f',tempo:'♩=60（6/4）→ 0:12 起 ♩=116（4/4）',idea:'m1–2 豎琴與低音弦樂、定音鼓滾奏；m3–4 木管與銅管長和弦（老大哥的和聲）；m5 起低音號、定音鼓、小鼓的機械進行曲，弦樂重音旋律',hits:['0:00 m1 豎琴、低音弦樂','0:12 m3 管樂和弦＋銅鈸（老大哥的和聲）','0:16 m5 進行曲開始']}},
- {name:'02 掌聲',dur:6,wall:'點',wallSub:'麻木的掌聲',ele:'每一下掌聲是一個點',lvl:'順從者中位',ref:[],
-  cues:['轉身離開','還沒出場','對著老大哥離開的方向麻木地拍拍手，拍完定像','還沒出場'],
+ {name:'02 掌聲',dur:6,wall:'點',wallSub:'麻木的掌聲',ele:'每一下掌聲是一個點',lvl:'兩人中位',ref:[],
+  cues:['轉身離開','（這時還是順從者）麻木地拍拍手，拍完定像','同另一個人，拍子完全一樣','還沒出場'],
   comp:{mood:'機械、整齊、沒有感情',dyn:'f，弦樂重音',tempo:'♩=116',idea:'m6–8 進行曲持續，小鼓十六分音符不停；順從者跟著鼓點拍手',hits:['0:18 m6 進行曲持續','0:22 m8 弦樂重音下行']}},
- {name:'03 分化',dur:12,wall:'面',wallSub:'兩個一樣的區塊',ele:'順從者先佔住左邊的區塊（面）；逐夢者進場走進右邊區塊，兩個區塊動作鏡像、一模一樣',lvl:'兩人中位，速度固定不變',ref:[],
-  cues:['（已離場）','0:28 隨著自己的進場音樂，從右邊側台走上來，走進右邊區塊；0:31 起跟順從者跳一模一樣的舞；麻木','走到左邊區塊，跳單調重複的舞；麻木','還沒出場'],
-  comp:{mood:'進行曲退去，空出位置',dyn:'f → 0:28 漸弱到 pp → 0:33 豎琴 pp→mp',tempo:'♩=116 → 0:33.7 ♩=126 → 0:34.7 ♩=92',idea:'m10–12 低音號長音漸弱、弦樂 pp；m13 豎琴滑奏；m14–15 短笛的小裝飾',hits:['0:26.5 m10 進行曲漸弱','0:28.6 m11 弦樂 pp，逐夢者進場','0:32.7 m13 豎琴滑奏','0:34.7 m15 短笛下行']}},
+ {name:'03 分化',dur:12,wall:'面',wallSub:'兩個一樣的區塊',ele:'一條線分成兩個區塊（面），兩個順從者動作鏡像、一模一樣',lvl:'兩人中位，速度固定不變',ref:[],
+  cues:['（已離場）','（這時還是順從者）走到右邊區塊，和另一個順從者跳一模一樣的舞；麻木','走到左邊區塊，跳一樣的舞；麻木','還沒出場'],
+  comp:{mood:'進行曲退去，空出位置',dyn:'f → 0:28 漸弱到 pp → 0:33 豎琴 pp→mp',tempo:'♩=116 → 0:33.7 ♩=126 → 0:34.7 ♩=92',idea:'m10–12 低音號長音漸弱、弦樂 pp；m13 豎琴滑奏；m14–15 短笛的小裝飾',hits:['0:26.5 m10 進行曲漸弱','0:28.6 m11 弦樂 pp','0:32.7 m13 豎琴滑奏','0:34.7 m15 短笛下行']}},
  {name:'04-1 夢想出現',dur:19,wall:'圓＋線',wallSub:'圈圈上階梯',ele:'圈圈上階梯：被夢想用隱形的線牽著繞圈，一階一階往上',lvl:'逐夢者低→中→高',ref:['circles','steps'],
   cues:['（已離場）','0:41 前還在跟順從者跳一樣的舞；夢想出現後被影響，脫掉灰色外套變成橘色，和夢想跳雙人舞，一階一階往上，最後在最高處定像；快樂','自己的音樂（0:35–0:41）響著，繼續照節拍跳一樣的舞，完全不受夢想影響；音樂結束才定像；麻木','0:41 隨著自己的音樂第一次出場，和逐夢者跳雙人舞，繞著他、用隱形的線牽著他往上；自由、輕快'],
   comp:{mood:'低音管獨白 → 全體休止 → 抒情圓舞曲',dyn:'p → 0:41 無聲 → mp～mf',tempo:'♩=72（2/4）→ 0:43.5 ♩=84（3/4，降 E 大調）',idea:'m16–18 低音管獨奏（順從者）；m19 全體休止（夢想出場）；m20 大提琴撥奏；m22 長笛旋律配豎琴與中提琴撥奏（雙人舞）',hits:['0:36 m16 低音管獨奏','0:41 m19 全體休止，夢想出場','0:43.5 m20 大提琴撥奏','0:47.8 m22 長笛旋律，雙人舞開始']}},
@@ -451,24 +467,17 @@ const Y_DOWN=P(60,.7,.45,40,120,{lean:-18,fz:1,ex:'受傷'});
 SEGS[0].pose=[
  t=>seq(t,[[6,t=>{const u=ease(t/6);return P(lerp(900,400,u),lerp(.6,.08,u),1+bob(t,.8),30,30,{vis:Math.min(1,t*1.5),ex:'慈父微笑'})}],
   [99,t=>P(400,.08,1,lerp(30,60,ease(t-6)),lerp(30,60,ease(t-6)),{ex:'慈父微笑'})]]),
- t=>OFF, /* 逐夢者 0:28 才進場 */
+ t=>{const x=Math.min(-300+64.3*t,600);return P(x,.8,.8+bob(t),30+20*sin(2*PI*.67*t),30-20*sin(2*PI*.67*t),{ex:'麻木'})}, /* 逐夢者（這時還是順從者）和另一個順從者一起走上台 */
  t=>{const x=Math.min(-400+64.3*t,500);return P(x,.8,.8+bob(t),30+20*sin(2*PI*.67*t),30-20*sin(2*PI*.67*t),{ex:'麻木'})},
  t=>OFF];
 SEGS[1].pose=[
  t=>{const u=ease(t/3);return P(lerp(400,1100,u),lerp(.08,.5,u),1+bob(t,.8),30,30,{vis:1-ease((t-2)/1),ex:'慈父微笑'})},
- t=>OFF,
+ t=>{const a=t>2&&t<5?40+50*Math.abs(sin(2*PI*(t-2))):40;return P(600,.8,.8,a,a,{fz:t>5?1:0,ex:'麻木'})},
  t=>{const a=t>2&&t<5?40+50*Math.abs(sin(2*PI*(t-2))):40;return P(500,.8,.8,a,a,{fz:t>5?1:0,ex:'麻木'})},
  t=>OFF];
 SEGS[2].pose=[
  t=>OFF,
- t=>{ /* 逐夢者：0:28（本段第 4 秒）隨進場音樂從右側台走進右邊區塊，0:31.5 起和順從者跳鏡像的同一支舞 */
-   const IN=4,ARR=7.5;
-   const walk=tt=>{const u=ease((tt-IN)/(ARR-IN));return P(lerp(1000,560,u),.45,.78+bob(tt),30+20*sin(2*PI*.67*tt),30-20*sin(2*PI*.67*tt),{vis:Math.min(1,(tt-IN)*2),ex:'麻木'})};
-   const dance=tt=>{const a=mono(tt-3);return P(560+15*sin(2*PI*(tt-3)/3),.45,.78,a,a,{ex:'麻木'})};
-   if(t<IN)return P(1000,.45,.78,30,30,{vis:0,ex:'麻木'});
-   if(t<ARR)return walk(t);
-   if(t<ARR+.8)return mix(walk(ARR),dance(t),ease((t-ARR)/.8));
-   return dance(t)},
+ t=>{const u=ease(t/3);const a=t>3?mono(t-3):40;return P(lerp(600,560,u)+(t>3?15*sin(2*PI*(t-3)/3):0),lerp(.8,.45,u),.78+(u<1?bob(t):0),a,a,{ex:'麻木'})}, /* 這時還是順從者：走到右邊區塊，跳鏡像的同一支舞 */
  t=>{const u=ease(t/3);const a=t>3?mono(t-3):40;return P(lerp(500,240,u)-(t>3?15*sin(2*PI*(t-3)/3):0),lerp(.8,.45,u),.78+(u<1?bob(t):0),a,a,{ex:'麻木'})},
  t=>OFF];
 /* 04-1：0:41 夢想隨自己的音樂出場（本段第 5 秒），0:41–0:55 是夢想與逐夢者的雙人舞 */
@@ -668,6 +677,7 @@ function drawPerson(i,p){
   const [X,Y,s]=proj(p.x,p.z);const S=s*1.35;
   f.shadow.setAttribute('cx',X);f.shadow.setAttribute('cy',Y+2);f.shadow.setAttribute('rx',24*s);f.shadow.setAttribute('ry',6*s);
   f.nameT.setAttribute('x',X);f.nameT.setAttribute('y',Y+16);
+  if(r.c2){const nm=p.c>=.5?r.name:'順從者';if(f.nameT.textContent!==nm)f.nameT.textContent=nm} /* 變色前還是順從者 */
   f.g.setAttribute('transform',`translate(${X},${Y}) scale(${S}) rotate(${p.lean}) scale(${.3+.7*Math.abs(cos(2*PI*p.turn))},1)`);
   const h=Math.max(.38,Math.min(1.05,p.h));
   const legs=8+58*(h-.38)/.62, hip=-legs, sh=hip-38, kx=(1-h)*20;
@@ -747,13 +757,13 @@ function refHi(keys){const on=k=>!keys.length||keys.includes(k);
 
 /* ---------- 總譜：跟隨、段落、檢視器 ---------- */
 const fmt1=x=>`${Math.floor(x/60)}:${(x%60).toFixed(1).padStart(4,'0')}`;
-let followM=0;
+let followKey='';
 function updFollow(){
-  const m=measAt(Math.min(t,TOTAL-.01));if(m===followM)return;followM=m;
-  const q=sysOf(m),box=$('fImg');box.replaceChildren(sysCrop(q,{h:150,cur:m}));box.dataset.page=q[0];box.dataset.m=m;
-  $('fM').textContent=`第 ${m} 小節／共 79 小節`;
-  $('fS').textContent=`${fmt1(MEAS_T[m-1])} 起・${tempoOf(m)}・總譜第 ${q[0]} 頁`;
-}
+  const m=measAt(Math.min(t,TOTAL-.01)),f=$('follow'),W=f.clientWidth-24,H=f.clientHeight-14,key=m+'|'+W+'|'+H;
+  if(key===followKey||W<=0)return;followKey=key;
+  const q=sysOf(m),a=(q[2]-q[1]+.012)*PAGE_AR/(SCORE_X[1]-SCORE_X[0]),el=sysCrop(q,W*a>H?{h:H,cur:m}:{w:W,cur:m});
+  el.insertAdjacentHTML('beforeend',`<span class="flab">第 ${m} 小節・${tempoOf(m)}・總譜第 ${q[0]} 頁</span>`);$('fImg').replaceChildren(el)}
+window.addEventListener('resize',()=>{followKey='';updFollow()});
 function segExtras(k){
   const cp=conceptPart(SEGS[k].ref);
   if(cp)$('segArt').replaceChildren(cp);else $('segArt').innerHTML=SEGS[k].ref.includes('steps')?'<div class="none">這一段用到點線面圖譜的「階梯」，彩色圖譜中沒有對應的部分。</div>':'<div class="none">這一段還沒用到圖譜元素。</div>';
@@ -811,7 +821,7 @@ function render(){
   ps.map((o,i)=>[o.p.z,i]).sort((a,b)=>b[0]-a[0]).forEach(([,i])=>{peopleG.appendChild(figs[i].root);drawPerson(i,ps[i].p)});
   $('time').textContent=`${fmt(t)} / ${fmt(TOTAL)}`;
   $('headbar').style.left=(t/TOTAL*100)+'%';
-  updFollow();
+  updFollow();updDeck();
 }
 function frame(ts){
   if(playing){
@@ -905,7 +915,7 @@ document.querySelectorAll('[data-credit]').forEach(e=>e.textContent=CREDITS[e.da
 $('foot').innerHTML=`點線面圖譜：${CREDITS.diagram}　・　彩色圖譜：${CREDITS.art}<br>${CREDITS.music}<br>${CREDITS.web}`;
 $('thumbs').innerHTML=Array.from({length:10},(_,i)=>`<button data-p="${i+1}" aria-label="總譜第 ${i+1} 頁"><img src="score/p${String(i+1).padStart(2,'0')}.webp" loading="lazy" alt=""><span>第 ${i+1} 頁</span></button>`).join('');
 $('thumbs').onclick=e=>{const b=e.target.closest('button');if(b)openScore(+b.dataset.p)};
-$('fImg').onclick=$('fOpen').onclick=()=>openScore(+$('fImg').dataset.page,+$('fImg').dataset.m);
+
 $('teamRow').innerHTML=`<span class="tl">小組成員</span>`+TEAM.map(([c,n])=>`<span><small>${c}</small><b>${n}</b></span>`).join('');
 const LIBS={
   h2c:'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
@@ -981,22 +991,21 @@ function buildSlides(pdf){
   add('s-over',`<div class="kick">角色與段落</div><h2>作品結構</h2><div style="margin-top:20px">${chips()}</div>
     <table>${SEGS.map(s=>`<tr><td class="n">${s.name}</td><td class="tm">${fmt(s.start)}–${fmt(s.start+s.dur)}</td><td class="w">${s.wall}</td><td class="d">${s.wallSub}</td></tr>`).join('')}</table>`);
   SEGS.forEach((s,k)=>{
-    const c=s.comp;
-    const d=add('s-seg',`<div class="kick">段落 ${k+1} / ${SEGS.length} ・ ${fmt(s.start)}–${fmt(s.start+s.dur)}（${s.dur} 秒）</div><h2>${s.name}</h2>
-      <div class="cols"><div class="left"><div class="stagebox">${pdf?'':'<span class="hint">點舞台重播 ・ 空白鍵暫停</span>'}</div>
-        <div class="tagsv"><div><b>點線面</b>${s.ele}</div><div><b>Level</b>${s.lvl}</div></div></div>
-      <div class="right"><div class="lab">走位與動作</div><ul class="cuesv">${s.cues.map((q,i)=>`<li><span class="dotv" style="background:${roleCol(i,k)}"></span><span><b>${ROLES[i].name}</b>　${q}</span></li>`).join('')}</ul>
-        <div class="mus"><div class="lab" style="margin:0">音樂</div><div><span class="k">情緒</span>${c.mood}</div><div><span class="k">力度</span>${c.dyn}　<span class="k">速度</span>${c.tempo}</div>
-        <div><span class="k">做法</span>${c.idea}</div><div><span class="k">提點</span>${c.hits.join('　')}</div></div></div></div>`);
-    d.dataset.seg=k;const cp=conceptPart(s.ref);if(cp)d.appendChild(cp);
-    {const r=segMeas(k),qs=sysInRange(r);
-     const sc=add('s-score',`<div class="kick">段落 ${k+1} / ${SEGS.length} ・ 總譜</div><h2>${s.name}<span class="ms">m${r[0]}–${r[1]}　${fmt1(MEAS_T[r[0]-1])}–${fmt1(MEAS_T[r[1]])}</span></h2>
-       <div class="note2">淡色的小節不屬於這一段<br>${CREDITS.music}</div><div class="grid"></div>`);
-     const g=sc.querySelector('.grid'),GW=1152,GH=500,GAP=12,cw=SCORE_X[1]-SCORE_X[0];
-     const ar=qs.map(q=>(q[2]-q[1]+.012)*PAGE_AR/cw);let best=null;   /* 選一個讓每行總譜都最大的排法 */
-     for(let c=1;c<=qs.length;c++){const rows=Math.ceil(qs.length/c),cellW=(GW-(c-1)*GAP)/c,cellH=(GH-(rows-1)*GAP)/rows;
-       const ws=ar.map(a=>Math.min(cellW,cellH/a)),mn=Math.min(...ws);if(!best||mn>best.mn)best={mn,ws}}
-     qs.forEach((q,i)=>g.appendChild(sysCrop(q,{w:best.ws[i],range:r})))}
+    const c=s.comp,r=segMeas(k);
+    const d=add('s-seg s-seg2',`<div class="kick">段落 ${k+1} / ${SEGS.length}</div><h2>${s.name}</h2>
+      <div class="cols"><div class="left"><div class="stagebox">${pdf?'':'<span class="hint">點舞台從頭播這一段 ・ 空白鍵暫停</span>'}</div>
+        <div class="mus2"><div><span class="k">情緒</span>${c.mood}</div><div><span class="k">音樂</span>${c.idea}</div></div></div>
+      <div class="right"><div class="scorehd">總譜 <span>${pdf?`m${r[0]}–${r[1]}（淡色的小節不屬於這一段）`:''}</span></div><div class="scorebox"></div>
+        <small class="credit">${CREDITS.music}</small></div></div>`);
+    d.dataset.seg=k;
+    const cp=conceptPart(s.ref);if(cp)d.querySelector('.right').appendChild(cp);
+    const box=d.querySelector('.scorebox'),qs=sysInRange(r);
+    if(pdf){ /* PDF 不能播放：放這一段的整段總譜 */
+      const GW=556,GH=cp?318:440,GAP=8,cw=SCORE_X[1]-SCORE_X[0],ar=qs.map(q=>(q[2]-q[1]+.012)*PAGE_AR/cw);let best=null;
+      for(let c2=1;c2<=qs.length;c2++){const rows=Math.ceil(qs.length/c2),cellW=(GW-(c2-1)*GAP)/c2,cellH=(GH-(rows-1)*GAP)/rows;
+        const ws=ar.map(x=>Math.min(cellW,cellH/x)),mn=Math.min(...ws);if(!best||mn>best.mn)best={mn,ws}}
+      qs.forEach((q,i)=>box.appendChild(sysCrop(q,{w:best.ws[i],range:r})))}
+    else box.style.height=(cp?318:440)+'px';
   });
   add('s-team',`<div class="kick">小組分工</div><h2>分工表</h2>
     <table>${DUTIES.map(([r,c,n])=>`<tr><td class="r">${r}</td><td class="c">${c}</td><td class="n">${n}</td></tr>`).join('')}</table>`);
@@ -1018,15 +1027,25 @@ document.body.appendChild(deck);
 let slides=[],cur=0;
 function fitSlide(){const s=slides[cur];if(!s)return;const v=$('deckView'),W=v.clientWidth,H=v.clientHeight,k=Math.min(W/1280,H/720)*.96;
   s.style.transform=`scale(${k})`;s.style.left=(W-1280*k)/2+'px';s.style.top=(H-720*k)/2+'px'}
-function playSeg(k){const s=SEGS[k];t=s.start+.01;stopAt=s.start+s.dur-.02;playing=true;updBtn();audioSync()}
-function show(i){
+function playSeg(k){const s=SEGS[k];t=s.start+.01;stopAt=null;playing=true;updBtn();audioSync()} /* 簡報：從這一段開始一路播下去 */
+function show(i,follow){ /* follow＝播放中自動翻到下一段：不重新定位音樂 */
   cur=Math.max(0,Math.min(slides.length-1,i));
   const v=$('deckView');v.innerHTML='';const s=slides[cur];v.appendChild(s);
   $('dCnt').textContent=`${cur+1} / ${slides.length}`;$('dPrev').disabled=cur===0;$('dNext').disabled=cur===slides.length-1;
-  if(s.dataset.seg!=null){s.querySelector('.stagebox').prepend(stageSvg);playSeg(+s.dataset.seg)}
+  if(s.dataset.seg!=null){s.querySelector('.stagebox').prepend(stageSvg);deckScoreM=0;if(!follow)playSeg(+s.dataset.seg);updDeck()}
   else{playing=false;stopAt=null;updBtn();audioSync()}
   fitSlide();
 }
+/* 簡報播放中：音樂跨段時自動翻到那一段的投影片；右邊總譜跟著音樂換行、框出目前的小節 */
+let deckScoreM=0;
+function updDeck(){
+  const dk=document.getElementById('deck');if(!dk||!dk.classList.contains('on'))return;const s=slides[cur];if(!s||s.dataset.seg==null)return;
+  const k=ps0k();if(playing&&k!==+s.dataset.seg){const j=slides.findIndex(x=>x.dataset.seg==k);if(j>=0){show(j,true);return}}
+  const m=measAt(Math.min(t,TOTAL-.01));if(m===deckScoreM)return;deckScoreM=m;
+  const box=s.querySelector('.scorebox');if(!box)return;const q=sysOf(m),H=parseFloat(box.style.height)-12,W=box.clientWidth-12||556;
+  const cw=SCORE_X[1]-SCORE_X[0],a=(q[2]-q[1]+.012)*PAGE_AR/cw,el=sysCrop(q,W*a>H?{h:H,cur:m}:{w:W,cur:m});
+  el.insertAdjacentHTML('beforeend',`<span class="flab">第 ${m} 小節・${tempoOf(m)}</span>`);box.replaceChildren(el)}
+const ps0k=()=>{let k=SEGS.length-1;for(let j=0;j<SEGS.length;j++)if(t<SEGS[j].start+SEGS[j].dur){k=j;break}return k};
 async function openDeck(){
   await Promise.race([loadLib('qr').catch(()=>{}),new Promise(r=>setTimeout(r,1500))]); /* 最後一頁的 QR code；載不到也照樣開簡報 */
   slides=buildSlides(false);deck.classList.add('on');document.body.style.overflow='hidden';show(0)}
@@ -1049,7 +1068,7 @@ document.addEventListener('keydown',e=>{
   else if(['ArrowLeft','PageUp','Backspace'].includes(k)){show(cur-1);e.preventDefault()}
   else if(k==='Home')show(0);else if(k==='End')show(slides.length-1);
   else if(k==='Escape'&&!document.fullscreenElement)closeDeck();
-  else if(k===' '){e.preventDefault();const s=slides[cur];if(s.dataset.seg!=null){if(!playing&&t>=stopAt)playSeg(+s.dataset.seg);else{playing=!playing;updBtn();audioSync()}}}
+  else if(k===' '){e.preventDefault();const s=slides[cur];if(s.dataset.seg!=null){if(!playing&&t>=TOTAL)playSeg(0);else{playing=!playing;updBtn();audioSync()}}}
 });
 window.addEventListener('resize',()=>{if(deck.classList.contains('on'))fitSlide()});
 

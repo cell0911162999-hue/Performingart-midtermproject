@@ -207,6 +207,7 @@
   .deck-bar{position:absolute;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;gap:8px;padding:0 12px;color:#fff}
   .deck-bar button{background:#2d2a26;color:#fff;border-color:#45403a;padding:7px 12px;font-size:13px}
   .deck-bar button:disabled{opacity:.35;cursor:default}
+  .deck-bar .dplay{min-width:96px;margin-left:8px;background:#f3efe6;color:#1d1b18;border-color:#f3efe6}
   .deck-bar .cnt{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px;min-width:56px;text-align:center}
   .deck-bar .sp{flex:1}
   #pdfStage{position:fixed;left:-20000px;top:0}
@@ -854,7 +855,7 @@ function frame(ts){
     if(t>=TOTAL){t=TOTAL;playing=false;updBtn();audioSync()}}
   render();requestAnimationFrame(frame);
 }
-function updBtn(){$('play').textContent=playing?'❚❚ 暫停':'▶ 播放';last=null}
+function updBtn(){const l=playing?'❚❚ 暫停':'▶ 播放';$('play').textContent=l;const d=document.getElementById('dPlay');if(d)d.textContent=l;last=null}
 $('play').onclick=()=>{if(t>=TOTAL)t=0;playing=!playing;updBtn();audioSync()};
 $('restart').onclick=()=>{t=0;playing=true;updBtn();audioSync()};
 $('speed').onclick=e=>{const b=e.target.closest('button');if(!b)return;speed=+b.dataset.s;
@@ -1044,7 +1045,7 @@ function buildSlides(pdf){
 
 /* ---- 簡報播放 ---- */
 const deck=document.createElement('div');deck.id='deck';
-deck.innerHTML=`<div id="deckView"></div><div class="deck-bar"><button id="dPrev" aria-label="上一張">‹ 上一張</button><span class="cnt" id="dCnt"></span><button id="dNext" aria-label="下一張">下一張 ›</button>
+deck.innerHTML=`<div id="deckView"></div><div class="deck-bar"><button id="dPrev" aria-label="上一張">‹ 上一張</button><span class="cnt" id="dCnt"></span><button id="dNext" aria-label="下一張">下一張 ›</button><button id="dPlay" class="dplay" hidden>❚❚ 暫停</button>
   <span class="sp"></span><button id="dPdf">⬇ PDF</button><button id="dFs">⛶ 全螢幕</button><button id="dClose">✕ 離開</button></div>`;
 document.body.appendChild(deck);
 let slides=[],cur=0;
@@ -1055,6 +1056,7 @@ function show(i,follow){ /* follow＝播放中自動翻到下一段：不重新�
   cur=Math.max(0,Math.min(slides.length-1,i));
   const v=$('deckView');v.innerHTML='';const s=slides[cur];v.appendChild(s);
   $('dCnt').textContent=`${cur+1} / ${slides.length}`;$('dPrev').disabled=cur===0;$('dNext').disabled=cur===slides.length-1;
+  $('dPlay').hidden=s.dataset.seg==null; /* 有動畫的段落頁才顯示暫停鍵 */
   if(s.dataset.seg!=null){s.querySelector('.stagebox').prepend(stageSvg);deckScoreM=0;if(!follow)playSeg(+s.dataset.seg);updDeck()}
   else{playing=false;stopAt=null;updBtn();audioSync()}
   fitSlide();
@@ -1078,6 +1080,7 @@ function closeDeck(){
   if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});
 }
 $('deckOpen').onclick=openDeck;
+$('dPlay').onclick=()=>{if(!playing&&t>=TOTAL)playSeg(0);else{playing=!playing;updBtn();audioSync()}};
 $('dPrev').onclick=()=>show(cur-1);$('dNext').onclick=()=>show(cur+1);$('dClose').onclick=closeDeck;
 $('dFs').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():deck.requestFullscreen().catch(()=>{})}catch(e){}};
 $('deckView').addEventListener('click',e=>{const s=slides[cur];if(s&&s.dataset.seg!=null&&e.target.closest('.stagebox'))playSeg(+s.dataset.seg)});

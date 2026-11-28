@@ -17,6 +17,8 @@
   header h1{font-size:20px;font-weight:900;margin:4px 0 2px;letter-spacing:.02em}
   header .course{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin-top:6px}
   header h1.theme{font-size:34px;line-height:1.25;margin:4px 0 4px;letter-spacing:.04em}
+  .video-link{display:inline-block;margin:2px 0 8px;padding:6px 14px;border-radius:999px;background:#1d1b18;color:#fff;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.04em}
+  .video-link:hover{background:#3a362f}
   header .work{font-size:15px;font-weight:700;color:#5b554c}
   header .tagline{font-size:14px;color:var(--muted);letter-spacing:.12em;margin:2px 0 12px}
   header .team-row{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin:0 0 12px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:12px}
@@ -226,6 +228,8 @@
 
   .s-cover{display:flex;flex-direction:column;justify-content:center;padding-bottom:60px}
   .s-cover h1{font-size:88px;font-weight:900;margin:10px 0 6px;letter-spacing:.04em}
+  .s-cover .vlink{align-self:flex-start;display:flex;align-items:center;gap:12px;margin:2px 0 22px;padding:9px 20px;border-radius:999px;background:#1d1b18;color:#fff;font-size:20px;font-weight:700;text-decoration:none;letter-spacing:.04em}
+  .s-cover .vlink span{font-size:13px;font-weight:400;opacity:.75;letter-spacing:0}
   .s-cover .sub{font-size:28px;font-weight:700;color:#5b554c;margin-bottom:34px}
   .s-cover .tagl{font-size:24px;color:var(--muted);letter-spacing:.14em;margin:-22px 0 30px}
   .s-cover .meta{font-size:19px;color:var(--muted);margin-top:26px}
@@ -298,6 +302,7 @@
   <header>
     <div class="course" id="hCourse">115-1 劇場遊戲 期中考</div>
     <h1 class="theme" id="hTheme">伸手之外</h1>
+    <a class="video-link" href="https://drive.google.com/file/d/1yz2bN1Q7bYtXrIsBcxijyIi2w4ysMCQ0/view?usp=drive_link" target="_blank" rel="noopener">▶ 觀看表演影片</a>
     <div class="work" id="hSub">以《1984》為本的舞蹈創作</div>
     <div class="tagline" id="hTag">「永遠碰不到的夢想」</div>
     <div class="team-row" id="teamRow"></div>
@@ -934,6 +939,7 @@ render();requestAnimationFrame(frame);
 
 /* ---------- 簡報模式與 PDF ---------- */
 /* 下載版 PDF 附上的網站連結；網站搬到別的網址（例如 GitHub Pages）時改這裡 */
+const VIDEO_URL='https://drive.google.com/file/d/1yz2bN1Q7bYtXrIsBcxijyIi2w4ysMCQ0/view?usp=drive_link';   /* 表演影片（Google 雲端硬碟） */
 const SITE_URL='https://cell0911162999-hue.github.io/Performingart-midtermproject/';
 /* 課程、主題、小組成員：網站標題區、簡報封面、每頁頁尾與結尾頁都會用到，改這裡就會一起更新 */
 const COURSE='115-1 劇場遊戲 期中考';
@@ -1008,7 +1014,7 @@ const chips=()=>`<div class="s-chips">${ROLES.map(r=>`<span class="s-chip"><i st
 function buildSlides(pdf){
   const out=[];
   const add=(cls,html)=>{const d=document.createElement('div');d.className='slide '+cls;d.innerHTML=html;out.push(d);return d};
-  add('s-cover',`<div class="kick">${COURSE}</div><h1>${THEME}</h1><div class="sub">${SUBTITLE}</div><div class="tagl">「${TAGLINE}」</div>
+  add('s-cover',`<div class="kick">${COURSE}</div><h1>${THEME}</h1><a class="vlink" href="${VIDEO_URL}" target="_blank" rel="noopener" data-link>▶ 觀看表演影片${pdf?`<span>${VIDEO_URL}</span>`:''}</a><div class="sub">${SUBTITLE}</div><div class="tagl">「${TAGLINE}」</div>
     ${chips()}<div class="meta">全長 ${fmt(TOTAL)} ・ ${SEGS.length} 個段落 ・ ${ROLES.length} 位角色</div>
     <div class="team"><div class="tl">小組成員</div><div class="tm">${TEAM.map(([c,n])=>`<div class="p"><small>${c}</small><b>${n}</b></div>`).join('')}</div></div>`);
   const lead=`<p class="lead">${document.querySelector('.concept .lead').innerHTML}</p>`,idea=`<ul>${document.querySelector('.concept .idea').innerHTML}</ul>`;
